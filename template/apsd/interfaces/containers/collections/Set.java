@@ -2,7 +2,7 @@ package apsd.interfaces.containers.collections;
 
 import apsd.interfaces.containers.base.IterableContainer;
 
-public interface Set<Data> extends Collection<Object> { // Must extend Collection
+public interface Set<Data> extends Collection { // Must extend Collection
 
   // Union
 

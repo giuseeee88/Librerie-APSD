@@ -7,7 +7,13 @@ import apsd.interfaces.containers.collections.SortedChain;
 import apsd.interfaces.containers.sequences.DynVector;
 
 /** Object: Concrete set implementation via (dynamic circular) vector. */
-public class VSortedChain<Data> extends VChainBase<Object> implements SortedChain<Object>{ // Must extend VChainBase and implements SortedChain
+public class VSortedChain<Data> extends VChainBase implements SortedChain{
+
+	@Override
+	public void Clear() {
+		// TODO Auto-generated method stub
+		
+	} // Must extend VChainBase and implements SortedChain
 
   // public VSortedChain()
 

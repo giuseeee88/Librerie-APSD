@@ -4,7 +4,7 @@ import apsd.classes.utilities.Natural;
 import apsd.interfaces.traits.Predicate;
 
 /** Interface: Iteratore all'indietro. */
-public interface BackwardIterator<Data> extends Iterator<Object> { // Must extend Iterator
+public interface BackwardIterator<Data> extends Iterator { // Must extend Iterator
 
   // Prev
 

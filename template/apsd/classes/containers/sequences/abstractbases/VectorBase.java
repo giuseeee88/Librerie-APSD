@@ -9,7 +9,7 @@ import apsd.interfaces.containers.sequences.MutableSequence;
 import apsd.interfaces.containers.sequences.Vector;
 
 /** Object: Abstract vector base implementation. */
-abstract public class VectorBase<Data> implements Vector<Object>{ // Must implement Vector
+abstract public class VectorBase<Data> implements Vector { // Must implement Vector
 
   // protected Data[] arr;
 

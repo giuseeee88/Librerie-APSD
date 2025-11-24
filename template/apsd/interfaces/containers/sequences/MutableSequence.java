@@ -5,7 +5,7 @@ import apsd.interfaces.containers.base.MutableIterableContainer;
 import apsd.interfaces.containers.iterators.MutableForwardIterator;
 
 /** Interface: Sequence & MutableIterableContainer con supporto alla scrittura tramite posizione. */
-public interface MutableSequence<Data> extends Sequence<Object>{ // Must extend Sequence and MutableIterableContainer
+public interface MutableSequence<Data> extends Sequence, MutableIterableContainer { // Must extend Sequence and MutableIterableContainer
 
   // SetAt
 

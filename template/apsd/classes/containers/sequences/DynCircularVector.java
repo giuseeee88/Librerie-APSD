@@ -5,7 +5,19 @@ import apsd.classes.utilities.Natural;
 import apsd.interfaces.containers.base.TraversableContainer;
 
 /** Object: Concrete dynamic circular vector implementation. */
-public class DynCircularVector<Data> extends DynCircularVectorBase<Object>{ // Must extend DynCircularVectorBase
+public class DynCircularVector<Data> extends DynCircularVectorBase{
+
+	@Override
+	public void Clear() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void Realloc(Natural newsize) {
+		// TODO Auto-generated method stub
+		
+	} // Must extend DynCircularVectorBase
 
   // public DynCircularVector()
 

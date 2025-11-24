@@ -5,7 +5,19 @@ import apsd.classes.utilities.Natural;
 import apsd.interfaces.containers.base.TraversableContainer;
 
 /** Object: Concrete dynamic (linear) vector implementation. */
-public class DynVector<Data> extends DynLinearVectorBase<Object>{ // Must extend DynLinearVectorBase
+public class DynVector<Data> extends DynLinearVectorBase{
+
+	@Override
+	public void Clear() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void Realloc(Natural newsize) {
+		// TODO Auto-generated method stub
+		
+	} // Must extend DynLinearVectorBase
 
   // public DynVector()
 

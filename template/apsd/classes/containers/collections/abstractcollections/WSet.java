@@ -6,7 +6,13 @@ import apsd.interfaces.containers.base.TraversableContainer;
 import apsd.interfaces.containers.collections.Chain;
 
 /** Object: Wrapper set implementation via chain. */
-public class WSet<Data> extends WSetBase<Object, Object> { // Must extend WSetBase
+public class WSet<Data> extends WSetBase {
+
+	@Override
+	public void Clear() {
+		// TODO Auto-generated method stub
+		
+	} // Must extend WSetBase
 
   // public WSet()
 

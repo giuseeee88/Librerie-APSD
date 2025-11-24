@@ -6,7 +6,13 @@ import apsd.interfaces.containers.base.TraversableContainer;
 import apsd.interfaces.containers.collections.SortedChain;
 
 /** Object: Wrapper ordered set implementation via ordered chain. */
-public class WOrderedSet<Data> extends WOrderedSetBase<Object, Object> { // Must extend WOrderedSetBase
+public class WOrderedSet<Data> extends WOrderedSetBase {
+
+	@Override
+	public void Clear() {
+		// TODO Auto-generated method stub
+		
+	} // Must extend WOrderedSetBase
 
   // public WOrderedSet()
 

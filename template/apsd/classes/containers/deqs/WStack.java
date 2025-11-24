@@ -7,7 +7,13 @@ import apsd.interfaces.containers.collections.List;
 import apsd.interfaces.containers.deqs.Stack;
 
 /** Object: Wrapper stack implementation. */
-public class WStack<Data> implements Stack<Object>{ // Must implement Stack
+public class WStack<Data> implements Stack{
+
+	@Override
+	public void Clear() {
+		// TODO Auto-generated method stub
+		
+	} // Must implement Stack
 
   // protected final List<Data> lst;
 

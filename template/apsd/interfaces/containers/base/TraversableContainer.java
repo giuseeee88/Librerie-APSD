@@ -7,7 +7,7 @@ import apsd.interfaces.traits.Accumulator;
 import apsd.interfaces.traits.Predicate;
 
 /** Interface: MembershipContainer con supporto all'attraversamento. */
-public interface TraversableContainer<Data> extends MembershipContainer<Object>{ // Must extend MembershipContainer
+public interface TraversableContainer<Data> extends MembershipContainer{ // Must extend MembershipContainer
 
   // TraverseForward
   // TraverseBackward
