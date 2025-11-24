@@ -13,6 +13,12 @@ public class WSet<Data> extends WSetBase<Data, VList<Data>> { // Must extend WSe
 		
 	}
 
+	@Override
+	public void Insert(long l) {
+		// TODO Auto-generated method stub
+		
+	}
+
   // public WSet()
 
   // public WSet(Chain<Data> chn)

@@ -4,7 +4,7 @@ import apsd.classes.containers.collections.concretecollections.VSortedChain;
 import apsd.interfaces.containers.base.TraversableContainer;
 import zapsdtest.simpletest.apsd.classes.containers.collections.concretecollections.generic.XSortedChainITest;
 
-public class VSortedChainITest extends XSortedChainITest {
+public class VSortedChainITest extends XSortedChainITest{
 
   public VSortedChainITest() {
     System.out.println("**** VSortedChainI *********************************");

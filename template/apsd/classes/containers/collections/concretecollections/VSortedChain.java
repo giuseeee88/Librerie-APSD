@@ -15,6 +15,12 @@ public class VSortedChain<Data extends Comparable<? super Data>> extends VChainB
 		
 	} // Must extend VChainBase and implements SortedChain
 
+	@Override
+	public void Insert(long l) {
+		// TODO Auto-generated method stub
+		
+	}
+
   // public VSortedChain()
 
   // public VSortedChain(VSortedChain<Data> chn)

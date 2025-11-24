@@ -17,6 +17,12 @@ public class LLSortedChain<Data extends Comparable<? super Data>> extends LLChai
 		
 	}
 
+	@Override
+	public void Insert(long l) {
+		// TODO Auto-generated method stub
+		
+	}
+
   // public LLSortedChain()
 
   // public LLSortedChain(LLSortedChain<Data> chn)

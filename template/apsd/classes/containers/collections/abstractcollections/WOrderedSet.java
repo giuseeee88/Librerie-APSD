@@ -13,6 +13,12 @@ public class WOrderedSet<Data extends Comparable<? super Data>> extends WOrdered
 		
 	}
 
+	@Override
+	public void Insert(long l) {
+		// TODO Auto-generated method stub
+		
+	}
+
   // public WOrderedSet()
 
   // public WOrderedSet(Chain<Data> chn)

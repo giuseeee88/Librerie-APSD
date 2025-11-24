@@ -1,10 +1,14 @@
 package zapsdtest.simpletest.apsd.classes.containers.collections.abstractcollections.generic;
 
+import apsd.classes.containers.collections.abstractcollections.WSet;
 import apsd.interfaces.containers.collections.Set;
-
 import org.junit.jupiter.api.*;
 
 abstract public class WSetITest extends WSetTest<Long> {
+  @Override
+  public Set<Long> GetNewEmptyContainer() {
+      return new WSet<>(); 
+  }
 
   @Override
   public void NewNonEmptyContainer() {
@@ -25,7 +29,7 @@ abstract public class WSetITest extends WSetTest<Long> {
   @Nested
   @DisplayName("WSet Basics")
   public class WSetBasics {
-
+	  
     @Test
     @DisplayName("Check starting from an Empty WSet")
     public void Empty() {
@@ -38,59 +42,57 @@ abstract public class WSetITest extends WSetTest<Long> {
       TestDifference(ThisContainer());
       TestSize(0, false);
     }
-
-    @Test
-    @DisplayName("Check starting from a NonEmpty WSet")
-    public void NonEmpty() {
-      AddTest(41);
-      NewNonEmptyContainer();
-      Set<Long> newcon = GetNewEmptyContainer();
-      newcon.Insert(3L);
-      newcon.Insert(1L);
-      newcon.Insert(5L);
-      TestInsert(-1L, true);
-      TestExists(1L, true);
-      TestExists(2L, true);
-      TestExists(3L, true);
-      TestExists(5L, false);
-      TestUnion(newcon);
-      TestExists(1L, true);
-      TestExists(3L, true);
-      TestExists(5L, true);
-      TestSize(7, false);
-      TestDifference(newcon);
-      TestExists(1L, false);
-      TestExists(3L, false);
-      TestExists(5L, false);
-      TestSize(4, false);
-      TestUnion(newcon);
-      TestExists(1L, true);
-      TestExists(3L, true);
-      TestExists(5L, true);
-      TestSize(7, false);
-      TestIntersection(newcon);
-      TestExists(-1L, false);
-      TestExists(2L, false);
-      TestSize(3, false);
-      TestInsert(4L, true);
-      TestInsert(0L, true);
-      TestInsert(4L, false);
-      TestInsert(3L, false);
-      TestInsert(1L, false);
-      TestInsert(3L, false);
-      TestInsert(2L, true);
-      TestInsert(0L, false);
-      TestInsert(5L, false);
-      TestPrintContent("");
-      TestSize(6, false);
-      TestFilter(dat -> dat % 2 == 0);
-      TestSize(3, false);
-      TestExists(5L, false);
-      TestExists(2L, true);
-      TestClear();
-      TestSize(0, false);
-    }
-
+     
+     @Test
+     @DisplayName("Check starting from a NonEmpty WSet")
+     public void NonEmpty() {
+       AddTest(41);
+       NewNonEmptyContainer();
+       Set<Long> newcon = GetNewEmptyContainer();
+       newcon.Insert(3L);
+       newcon.Insert(1L);
+       newcon.Insert(5L);
+       TestInsert(-1L, true);
+       TestExists(1L, true);
+       TestExists(2L, true);
+       TestExists(3L, true);
+       TestExists(5L, false);
+       TestUnion(newcon);
+       TestExists(1L, true);
+       TestExists(3L, true);
+       TestExists(5L, true);
+       TestSize(7, false);
+       TestDifference(newcon);
+       TestExists(1L, false);
+       TestExists(3L, false);
+       TestExists(5L, false);
+       TestSize(4, false);
+       TestUnion(newcon);
+       TestExists(1L, true);
+       TestExists(3L, true);
+       TestExists(5L, true);
+       TestSize(7, false);
+       TestIntersection(newcon);
+       TestExists(-1L, false);
+       TestExists(2L, false);
+       TestSize(3, false);
+       TestInsert(4L, true);
+       TestInsert(0L, true);
+       TestInsert(4L, false);
+       TestInsert(3L, false);
+       TestInsert(1L, false);
+       TestInsert(3L, false);
+       TestInsert(2L, true);
+       TestInsert(0L, false);
+       TestInsert(5L, false);
+       TestPrintContent("");
+       TestSize(6, false);
+       TestFilter(dat -> dat % 2 == 0);
+       TestSize(3, false);
+       TestExists(5L, false);
+       TestExists(2L, true);
+       TestClear();
+       TestSize(0, false);
+     }
   }
-
 }
