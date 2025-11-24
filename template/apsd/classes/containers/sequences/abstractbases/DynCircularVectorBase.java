@@ -5,7 +5,7 @@ import apsd.interfaces.containers.base.TraversableContainer;
 import apsd.interfaces.containers.sequences.DynVector;
 
 /** Object: Abstract dynamic circular vector base implementation. */
-abstract public class DynCircularVectorBase<Data> extends CircularVectorBase implements DynVector{ // Must extend CircularVectorBase and implement DynVector
+abstract public class DynCircularVectorBase<Data> extends CircularVectorBase<Data> implements DynVector<Data>{ // Must extend CircularVectorBase and implement DynVector
 
   // protected long size = 0L;
 

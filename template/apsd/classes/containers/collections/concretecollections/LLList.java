@@ -12,7 +12,7 @@ import apsd.interfaces.containers.iterators.MutableForwardIterator;
 import apsd.interfaces.containers.sequences.MutableSequence;
 
 /** Object: Concrete list implementation on linked-list. */
-public class LLList<Data> extends LLChainBase implements List{ // Must extend LLChainBase and implement List
+public class LLList<Data> extends LLChainBase<Data> implements List<Data>{ // Must extend LLChainBase and implement List
 
   // public LLList()
 
