@@ -1,20 +1,20 @@
 package apsd.classes.containers.collections.concretecollections.bases;
 
-// import apsd.classes.containers.sequences.Vector;
-// import apsd.classes.utilities.Box;
-// import apsd.classes.utilities.MutableNatural;
-// import apsd.classes.utilities.Natural;
-// import apsd.interfaces.containers.base.TraversableContainer;
-// import apsd.interfaces.containers.collections.Chain;
-// import apsd.interfaces.containers.iterators.BackwardIterator;
-// import apsd.interfaces.containers.iterators.ForwardIterator;
-// import apsd.interfaces.containers.iterators.MutableBackwardIterator;
-// import apsd.interfaces.containers.iterators.MutableForwardIterator;
-// import apsd.interfaces.containers.sequences.Sequence;
-// import apsd.interfaces.traits.Predicate;
+import apsd.classes.containers.sequences.Vector;
+import apsd.classes.utilities.Box;
+import apsd.classes.utilities.MutableNatural;
+import apsd.classes.utilities.Natural;
+import apsd.interfaces.containers.base.TraversableContainer;
+import apsd.interfaces.containers.collections.Chain;
+import apsd.interfaces.containers.iterators.BackwardIterator;
+import apsd.interfaces.containers.iterators.ForwardIterator;
+import apsd.interfaces.containers.iterators.MutableBackwardIterator;
+import apsd.interfaces.containers.iterators.MutableForwardIterator;
+import apsd.interfaces.containers.sequences.Sequence;
+import apsd.interfaces.traits.Predicate;
 
 /** Object: Abstract chain base implementation on linked-list. */
-abstract public class LLChainBase<Data> { // Must implement Chain
+abstract public class LLChainBase<Data> implements Chain<Object>{ // Must implement Chain
 
   // protected final MutableNatural size = new MutableNatural();
   // protected final Box<LLNode<Data>> headref = new Box<>();

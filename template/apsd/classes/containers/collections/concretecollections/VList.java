@@ -1,18 +1,17 @@
 package apsd.classes.containers.collections.concretecollections;
 
 import apsd.interfaces.containers.sequences.DynVector;
-
-// import apsd.classes.containers.collections.concretecollections.bases.VChainBase;
-// import apsd.classes.utilities.Natural;
-// import apsd.interfaces.containers.base.TraversableContainer;
-// import apsd.interfaces.containers.collections.List;
-// import apsd.interfaces.containers.iterators.MutableBackwardIterator;
-// import apsd.interfaces.containers.iterators.MutableForwardIterator;
-// import apsd.interfaces.containers.sequences.DynVector;
-// import apsd.interfaces.containers.sequences.MutableSequence;
+import apsd.classes.containers.collections.concretecollections.bases.VChainBase;
+import apsd.classes.utilities.Natural;
+import apsd.interfaces.containers.base.TraversableContainer;
+import apsd.interfaces.containers.collections.List;
+import apsd.interfaces.containers.iterators.MutableBackwardIterator;
+import apsd.interfaces.containers.iterators.MutableForwardIterator;
+import apsd.interfaces.containers.sequences.DynVector;
+import apsd.interfaces.containers.sequences.MutableSequence;
 
 /** Object: Concrete list implementation on (dynamic circular) vector. */
-public class VList<Data> { // Must extend VChainBase and implement List
+public class VList<Data> extends VChainBase<Object> implements List<Object>{ // Must extend VChainBase and implement List
 
   // public VList()
 

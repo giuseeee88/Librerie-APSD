@@ -1,10 +1,10 @@
 package apsd.classes.containers.sequences.abstractbases;
 
-// import apsd.classes.utilities.Natural;
-// import apsd.interfaces.containers.base.TraversableContainer;
+import apsd.classes.utilities.Natural;
+import apsd.interfaces.containers.base.TraversableContainer;
 
 /** Object: Abstract (static) circular vector base implementation. */
-abstract public class CircularVectorBase<Data> { // Must extend VectorBase
+abstract public class CircularVectorBase<Data> extends VectorBase<Object>{ // Must extend VectorBase
 
   // protected long start = 0L;
 

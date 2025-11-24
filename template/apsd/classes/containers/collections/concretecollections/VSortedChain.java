@@ -1,13 +1,13 @@
 package apsd.classes.containers.collections.concretecollections;
 
-// import apsd.classes.containers.collections.concretecollections.bases.VChainBase;
-// import apsd.classes.utilities.Natural;
-// import apsd.interfaces.containers.base.TraversableContainer;
-// import apsd.interfaces.containers.collections.SortedChain;
-// import apsd.interfaces.containers.sequences.DynVector;
+import apsd.classes.containers.collections.concretecollections.bases.VChainBase;
+import apsd.classes.utilities.Natural;
+import apsd.interfaces.containers.base.TraversableContainer;
+import apsd.interfaces.containers.collections.SortedChain;
+import apsd.interfaces.containers.sequences.DynVector;
 
 /** Object: Concrete set implementation via (dynamic circular) vector. */
-public class VSortedChain<Data> { // Must extend VChainBase and implements SortedChain
+public class VSortedChain<Data> extends VChainBase<Object> implements SortedChain<Object>{ // Must extend VChainBase and implements SortedChain
 
   // public VSortedChain()
 

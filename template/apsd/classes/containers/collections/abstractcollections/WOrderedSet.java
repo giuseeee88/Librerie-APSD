@@ -1,12 +1,12 @@
 package apsd.classes.containers.collections.abstractcollections;
 
-// import apsd.classes.containers.collections.abstractcollections.bases.WOrderedSetBase;
-// import apsd.classes.containers.collections.concretecollections.VSortedChain;
-// import apsd.interfaces.containers.base.TraversableContainer;
-// import apsd.interfaces.containers.collections.SortedChain;
+import apsd.classes.containers.collections.abstractcollections.bases.WOrderedSetBase;
+import apsd.classes.containers.collections.concretecollections.VSortedChain;
+import apsd.interfaces.containers.base.TraversableContainer;
+import apsd.interfaces.containers.collections.SortedChain;
 
 /** Object: Wrapper ordered set implementation via ordered chain. */
-public class WOrderedSet<Data> { // Must extend WOrderedSetBase
+public class WOrderedSet<Data> extends WOrderedSetBase<Object, Object> { // Must extend WOrderedSetBase
 
   // public WOrderedSet()
 

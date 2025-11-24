@@ -1,15 +1,15 @@
 package apsd.classes.containers.collections.concretecollections;
 
-// import apsd.classes.containers.collections.concretecollections.bases.LLChainBase;
-// import apsd.classes.containers.collections.concretecollections.bases.LLNode;
-// import apsd.classes.utilities.Box;
-// import apsd.classes.utilities.Natural;
-// import apsd.interfaces.containers.base.TraversableContainer;
-// import apsd.interfaces.containers.collections.SortedChain;
-// import apsd.interfaces.containers.iterators.ForwardIterator;
+import apsd.classes.containers.collections.concretecollections.bases.LLChainBase;
+import apsd.classes.containers.collections.concretecollections.bases.LLNode;
+import apsd.classes.utilities.Box;
+import apsd.classes.utilities.Natural;
+import apsd.interfaces.containers.base.TraversableContainer;
+import apsd.interfaces.containers.collections.SortedChain;
+import apsd.interfaces.containers.iterators.ForwardIterator;
 
 /** Object: Concrete sorted chain implementation on linked-list. */
-public class LLSortedChain<Data> { // Must extend LLChainBase and implement SortedChain
+public class LLSortedChain<Data> extends LLChainBase<Object> implements SortedChain<Object> { // Must extend LLChainBase and implement SortedChain
 
   // public LLSortedChain()
 

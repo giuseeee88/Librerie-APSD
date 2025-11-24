@@ -1,11 +1,11 @@
 package apsd.classes.containers.sequences.abstractbases;
 
-// import apsd.classes.utilities.Natural;
-// import apsd.interfaces.containers.base.TraversableContainer;
-// import apsd.interfaces.containers.sequences.DynVector;
+import apsd.classes.utilities.Natural;
+import apsd.interfaces.containers.base.TraversableContainer;
+import apsd.interfaces.containers.sequences.DynVector;
 
 /** Object: Abstract dynamic circular vector base implementation. */
-abstract public class DynCircularVectorBase<Data> { // Must extend CircularVectorBase and implement DynVector
+abstract public class DynCircularVectorBase<Data> extends CircularVectorBase<Object> implements DynVector<Object>{ // Must extend CircularVectorBase and implement DynVector
 
   // protected long size = 0L;
 

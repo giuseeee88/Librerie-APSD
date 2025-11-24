@@ -1,15 +1,16 @@
 package apsd.classes.containers.collections.abstractcollections.bases;
 
-// import apsd.classes.utilities.Natural;
-// import apsd.interfaces.containers.base.TraversableContainer;
-// import apsd.interfaces.containers.collections.Chain;
-// import apsd.interfaces.containers.collections.Set;
-// import apsd.interfaces.containers.iterators.BackwardIterator;
-// import apsd.interfaces.containers.iterators.ForwardIterator;
-// import apsd.interfaces.traits.Predicate;
+import apsd.interfaces.containers.collections.Set;
+import apsd.classes.utilities.Natural;
+import apsd.interfaces.containers.base.TraversableContainer;
+import apsd.interfaces.containers.collections.Chain;
+import apsd.interfaces.containers.collections.Set;
+import apsd.interfaces.containers.iterators.BackwardIterator;
+import apsd.interfaces.containers.iterators.ForwardIterator;
+import apsd.interfaces.traits.Predicate;
 
 /** Object: Abstract wrapper set base implementation via chain. */
-abstract public class WSetBase<Data, Chn> { // Must implement Set; Chn must extend Chain
+abstract public class WSetBase<Data, Chn> implements Set { // Must implement Set; Chn must extend Chain
 
   // protected Chn chn;
 
