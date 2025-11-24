@@ -3,7 +3,7 @@ package apsd.interfaces.containers.deqs;
 import apsd.interfaces.containers.base.ClearableContainer;
 import apsd.interfaces.containers.base.InsertableContainer;
 
-public interface Queue<Data> extends ClearableContainer, InsertableContainer { // Must extend ClearableContainer and InsertableContainer
+public interface Queue<Data> extends ClearableContainer, InsertableContainer<Data> { // Must extend ClearableContainer and InsertableContainer
 
   // Head
   // Dequeue

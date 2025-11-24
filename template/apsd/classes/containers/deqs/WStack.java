@@ -7,7 +7,7 @@ import apsd.interfaces.containers.collections.List;
 import apsd.interfaces.containers.deqs.Stack;
 
 /** Object: Wrapper stack implementation. */
-public class WStack<Data> implements Stack{
+public class WStack<Data> implements Stack<Data>{
 
 	@Override
 	public void Clear() {

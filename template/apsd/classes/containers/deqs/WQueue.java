@@ -7,7 +7,7 @@ import apsd.interfaces.containers.collections.List;
 import apsd.interfaces.containers.deqs.Queue;
 
 /** Object: Wrapper queue implementation. */
-public class WQueue<Data> implements Queue{
+public class WQueue<Data> implements Queue<Data>{
 
 	@Override
 	public void Clear() {
