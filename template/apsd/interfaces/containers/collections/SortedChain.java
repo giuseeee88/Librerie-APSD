@@ -1,9 +1,9 @@
 package apsd.interfaces.containers.collections;
 
-// import apsd.classes.utilities.Natural;
-// import apsd.interfaces.containers.sequences.SortedSequence;
+import apsd.classes.utilities.Natural;
+import apsd.interfaces.containers.sequences.SortedSequence;
 
-public interface SortedChain<Data> { // Must extend OrderedChain and SortedSequence
+public interface SortedChain<Data> extends OrderedChain<Object>, SortedSequence<Object>{ // Must extend OrderedChain and SortedSequence
 
   // SearchPredecessor
 

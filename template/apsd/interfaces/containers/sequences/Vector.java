@@ -1,9 +1,9 @@
 package apsd.interfaces.containers.sequences;
 
-// import apsd.classes.utilities.Natural;
-// import apsd.interfaces.containers.base.ReallocableContainer;
+import apsd.classes.utilities.Natural;
+import apsd.interfaces.containers.base.ReallocableContainer;
 
-public interface Vector<Data> { // Must extend ReallocableContainer and MutableSequence
+public interface Vector<Data> extends ReallocableContainer, MutableSequence<Object>{ // Must extend ReallocableContainer and MutableSequence
 
   // ShiftLeft
 

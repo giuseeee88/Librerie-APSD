@@ -1,15 +1,15 @@
 package apsd.classes.containers.sequences.abstractbases;
 
-// import apsd.classes.utilities.MutableNatural;
-// import apsd.classes.utilities.Natural;
-// import apsd.interfaces.containers.base.TraversableContainer;
-// import apsd.interfaces.containers.iterators.MutableBackwardIterator;
-// import apsd.interfaces.containers.iterators.MutableForwardIterator;
-// import apsd.interfaces.containers.sequences.MutableSequence;
-// import apsd.interfaces.containers.sequences.Vector;
+import apsd.classes.utilities.MutableNatural;
+import apsd.classes.utilities.Natural;
+import apsd.interfaces.containers.base.TraversableContainer;
+import apsd.interfaces.containers.iterators.MutableBackwardIterator;
+import apsd.interfaces.containers.iterators.MutableForwardIterator;
+import apsd.interfaces.containers.sequences.MutableSequence;
+import apsd.interfaces.containers.sequences.Vector;
 
 /** Object: Abstract vector base implementation. */
-abstract public class VectorBase<Data> { // Must implement Vector
+abstract public class VectorBase<Data> implements Vector<Object>{ // Must implement Vector
 
   // protected Data[] arr;
 
