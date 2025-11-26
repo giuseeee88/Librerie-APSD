@@ -17,19 +17,18 @@ public interface TraversableContainer<Data> extends MembershipContainer<Data>{ /
 	 if (fun != null) TraverseForward(dat -> { acc.Set(fun.Apply(dat, acc.Get())); return false; });
 	 return acc.Get();
   }
-
-  // FoldBackward
-
-  /* ************************************************************************ */
-  /* Override specific member functions from Container                        */
-  /* ************************************************************************ */
-
-  // ...
-
-  /* ************************************************************************ */
-  /* Override specific member functions from MembershipContainer              */
-  /* ************************************************************************ */
-
-  // ...
-
+  
+  //Da verificare
+  default <Acc> Acc FoldBackward(Accumulator<Data, Acc> fun, Acc ini) {
+	 final Box<Acc> acc = new Box<>(ini);
+	 if (fun != null) TraverseBackward(dat -> { acc.Set(fun.Apply(dat, acc.Get())); return false; });
+	 return acc.Get();
+  }
+  
+  @Override
+  Natural Size();
+  
+  @Override
+  boolean Exists(Data dat);
+  
 }

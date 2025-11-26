@@ -12,10 +12,12 @@ public interface IterableContainer<Data> extends TraversableContainer<Data>{ // 
   BackwardIterator<Data> BIterator();
 
   boolean IsEqual(IterableContainer<Data> container);
-
-  /* ************************************************************************ */
-  /* Override specific member functions from TraversableContainer             */
-  /* ************************************************************************ */
+  
+  @Override
+  boolean TraverseForward(Predicate<Data> predicate);
+  
+  @Override
+  boolean TraverseBackward(Predicate<Data> predicate);
 
   // ...
 

@@ -10,22 +10,13 @@ public interface ReallocableContainer extends ClearableContainer, Reallocable { 
   double SHRINK_FACTOR = 2.0; // Must be strictly greater than 1.0
 
   Natural Capacity();
-  
   void Grow();
   void Grow(Natural n);
+  default void Shrink() {};
+
+  @Override
+  Natural Size();
   
-  void Shrink();
-
-  /* ************************************************************************ */
-  /* Override specific member functions from Container                        */
-  /* ************************************************************************ */
-
-  // ...
-
-  /* ************************************************************************ */
-  /* Override specific member functions from ClearableContainer               */
-  /* ************************************************************************ */
-
-  // ...
-
+  @Override
+  void Clear();
 }

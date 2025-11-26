@@ -6,10 +6,12 @@ import apsd.interfaces.traits.Predicate;
 /** Interface: Iteratore all'indietro. */
 public interface BackwardIterator<Data> extends Iterator<Data> { // Must extend Iterator
 
-  // Prev
+  void Prev();
+  
+  void Prev(Natural n);
 
-  // DataNPrev
+  Data DataNPrev(Data dat);
 
-  // ForEachBackward
+  boolean ForEachBackward(Predicate<Data> predicate);
 
 }
