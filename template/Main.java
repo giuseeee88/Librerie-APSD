@@ -1,3 +1,4 @@
+
 public class Main {
 
   static public void main(String[] args) {
@@ -7,4 +8,5 @@ public class Main {
     // Aggiungere test personali!
 
   }
+
 }
