@@ -1,29 +1,23 @@
 package apsd.interfaces.containers.collections;
 
-public interface OrderedSet<Data> extends Set<Data> { // Must extend Set
+public interface OrderedSet<Data extends Comparable<? super Data>> extends Set<Data> { // Must extend Set
 
-  // Min
+  Data min();
+  Data max();
 
-  // RemoveMin
+  void RemoveMin();
+  void RemoveMax();
 
-  // MinNRemove
+  Data MinNRemove();
+  Data MaxNRemove();
 
-  // Max
+  Data Predecessor(Data dat);
+  Data Successor(Data dat);
 
-  // RemoveMax
+  void RemovePredecessor(Data dat);
+  void RemoveSuccessor(Data dat);
 
-  // MaxNRemove
-
-  // Predecessor
-
-  // RemovePredecessor
-
-  // PredecessorNRemove
-
-  // Successor
-
-  // RemoveSuccessor
-
-  // SuccessorNRemove
+  Data PredecessorNRemove(Data dat);
+  Data SuccessorNRemove(Data dat);
 
 }

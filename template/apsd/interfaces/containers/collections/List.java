@@ -6,7 +6,9 @@ import apsd.interfaces.containers.sequences.MutableSequence;
 
 public interface List<Data> extends MutableSequence<Data>, InsertableAtSequence<Data>, Chain<Data>{ // Must extend MutableSequence, InsertableAtSequence, and Chain
 
-  // SubList
+  List<Data> SubList(Natural start, Natural end);
+  
+  boolean Insert(Data dat);
 
   /* ************************************************************************ */
   /* Override specific member functions from ExtensibleContainer              */

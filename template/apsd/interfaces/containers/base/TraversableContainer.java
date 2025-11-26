@@ -9,14 +9,14 @@ import apsd.interfaces.traits.Predicate;
 /** Interface: MembershipContainer con supporto all'attraversamento. */
 public interface TraversableContainer<Data> extends MembershipContainer<Data>{ // Must extend MembershipContainer
 
-  // TraverseForward
-  // TraverseBackward
+  boolean TraverseForward(Predicate<Data> predicate);
+  boolean TraverseBackward(Predicate<Data> predicate);
 
-  // default <Acc> Acc FoldForward(Accumulator<Data, Acc> fun, Acc ini) {
-  //   final Box<Acc> acc = new Box<>(ini);
-  //   if (fun != null) TraverseForward(dat -> { acc.Set(fun.Apply(dat, acc.Get())); return false; });
-  //   return acc.Get();
-  // }
+  default <Acc> Acc FoldForward(Accumulator<Data, Acc> fun, Acc ini) {
+	 final Box<Acc> acc = new Box<>(ini);
+	 if (fun != null) TraverseForward(dat -> { acc.Set(fun.Apply(dat, acc.Get())); return false; });
+	 return acc.Get();
+  }
 
   // FoldBackward
 

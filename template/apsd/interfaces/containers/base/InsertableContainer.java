@@ -1,12 +1,12 @@
 package apsd.interfaces.containers.base;
 
 /** Interface: Container con supporto all'inserimento di un dato. */
-public interface InsertableContainer<Data> extends Container{ // Must extend Container
+public interface InsertableContainer<Data> extends Container { // Must extend Container
 
-  // Insert
+  boolean Insert(Data dat);
 
-  // InsertAll
-
-  // InsertSome
+  boolean InsertAll(TraversableContainer<Data> container);
+  
+  boolean InsertSome(TraversableContainer<Data> container);
 
 }

@@ -5,11 +5,14 @@ import apsd.classes.utilities.Natural;
 /** Interface: ReallocableContainer che è espandibile e riducibile. */
 public interface ResizableContainer extends ReallocableContainer { // Must extend ReallocableContainer
 
-  double THRESHOLD_FACTOR = 2.0; // Must be strictly greater than 1.
-
-  // Expand
-
-  // Reduce
+  double THRESHOLD_FACTOR = 2.0; // Must be strictly greater than 1.0
+  
+  void Expand();
+  void Expand(Natural n);
+  
+  void Reduce();
+  void Reduce(Natural n);
+  
 
   /* ************************************************************************ */
   /* Override specific member functions from Container                        */
