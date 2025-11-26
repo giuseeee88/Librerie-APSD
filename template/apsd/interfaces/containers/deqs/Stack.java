@@ -5,25 +5,17 @@ import apsd.interfaces.containers.base.InsertableContainer;
 
 public interface Stack<Data> extends ClearableContainer, InsertableContainer<Data> { // Must extend ClearableContainer and InsertableContainer
 
-  // Top
-  // Pop
-  // TopNPop
-
-  // SwapTop
-  // TopNSwap
-
-  // Push
-
-  /* ************************************************************************ */
-  /* Override specific member functions from ClearableContainer               */
-  /* ************************************************************************ */
-
-  // ...
-
-  /* ************************************************************************ */
-  /* Override specific member functions from InsertableContainer              */
-  /* ************************************************************************ */
-
-  // ...
+  Data Top();
+  Data Pop();
+  Data TopNPop();
+  void SwapTop(Data dat);
+  Data TopNSwap(Data dat);
+  void Push(Data dat);
+  
+  @Override
+  void Clear();
+  
+  @Override
+  boolean Insert(Data dat);
 
 }

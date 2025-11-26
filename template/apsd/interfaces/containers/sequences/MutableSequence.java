@@ -7,24 +7,21 @@ import apsd.interfaces.containers.iterators.MutableForwardIterator;
 /** Interface: Sequence & MutableIterableContainer con supporto alla scrittura tramite posizione. */
 public interface MutableSequence<Data> extends Sequence<Data>, MutableIterableContainer<Data> { // Must extend Sequence and MutableIterableContainer
 
-  // SetAt
+  void SetAt(Data dat, Natural n);
 
-  // GetNSetAt
+  Data GetNSetAt(Data dat, Natural n);
 
-  // SetFirst
+  void SetFirst(Data dat);
 
-  // GetNSetFirst
+  Data GetNSetFirst(Data dat);
 
-  // SetLast
+  void SetLast(Data dat);
 
-  // GetNSetLast
+  Data GetNSetLast(Data dat);
 
-  // Swap
-
-  /* ************************************************************************ */
-  /* Override specific member functions from Sequence                         */
-  /* ************************************************************************ */
-
-  // ...
+  void Swap(Natural pos1, Natural pos2);
+  
+  @Override
+  MutableSequence<Data> SubSequence(Natural start, Natural end);
 
 }

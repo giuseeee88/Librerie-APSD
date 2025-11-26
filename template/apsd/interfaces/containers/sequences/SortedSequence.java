@@ -5,16 +5,10 @@ import apsd.interfaces.containers.base.SortedIterableContainer;
 
 /** Interface: Sequence & SortedIterableContainer. */
 public interface SortedSequence<Data extends Comparable<? super Data>> extends Sequence<Data>, SortedIterableContainer<Data> {
-  /* ************************************************************************ */
-  /* Override specific member functions from MembershipContainer              */
-  /* ************************************************************************ */
-
-  // ...
-
-  /* ************************************************************************ */
-  /* Override specific member functions from Sequence                         */
-  /* ************************************************************************ */
-
-  // ...
+  @Override
+  boolean Exists(Data dat);
+  
+  @Override
+  Natural Search(Data dat);
 
 }
