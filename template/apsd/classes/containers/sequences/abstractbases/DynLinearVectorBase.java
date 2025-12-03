@@ -7,32 +7,37 @@ import apsd.interfaces.containers.sequences.DynVector;
 /** Object: Abstract dynamic linear vector base implementation. */
 abstract public class DynLinearVectorBase<Data> extends LinearVectorBase<Data> implements DynVector<Data>{ // Must extend LinearVectorBase and implement DynVector
 
-  // protected long size = 0L;
+  protected long size = 0L;
 
   // DynLinearVectorBase
+  
+  @Override
+  public Natural Size() {
+	return new Natural(size);
+  }
+  
+  @Override
+  public void Clear() {
+	  
+  }
+  
+  @Override
+  public void Realloc(Natural size) {
+	  
+  }
+  
+  @Override
+  public void Expand(Natural size) {
+	  
+  }
+  
+  @Override
+  public void Reduce(Natural size) {
+	  
+  }
+  
+  @Override
+  public void ArrayAlloc(Natural newsize) {
 
-  /* ************************************************************************ */
-  /* Override specific member functions from Container                        */
-  /* ************************************************************************ */
-
-  // ...
-
-  /* ************************************************************************ */
-  /* Override specific member functions from ClearableContainer               */
-  /* ************************************************************************ */
-
-  // ...
-
-  /* ************************************************************************ */
-  /* Override specific member functions from ReallocableContainer             */
-  /* ************************************************************************ */
-
-  // ...
-
-  /* ************************************************************************ */
-  /* Override specific member functions from ResizableContainer               */
-  /* ************************************************************************ */
-
-  // ...
-
+  }
 }

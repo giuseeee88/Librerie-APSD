@@ -5,16 +5,12 @@ import apsd.interfaces.containers.sequences.RemovableAtSequence;
 
 public interface Chain<Data> extends RemovableAtSequence<Data> { // Must extend RemovableAtSequence
 
-  // InsertIfAbsent
-
-  // RemoveOccurrences
-
-  // SubChain
-
-  /* ************************************************************************ */
-  /* Override specific member functions from Sequence                         */
-  /* ************************************************************************ */
-
-  // ...
-
+  boolean InsertIfAbsent(Data dat);
+  
+  void RemoveOccurrences(Data dat);
+  
+  Chain<Data> SubChain(Natural start, Natural end);
+  
+  @Override
+  Natural Search(Data dat);
 }

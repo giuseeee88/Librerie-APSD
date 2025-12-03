@@ -16,12 +16,6 @@ public interface Set<Data> extends Collection<Data> {
 	
 	void Intersection(Set<Data> set);
 	
+	@Override
 	boolean IsEqual(IterableContainer<Data> set);
-
-  /* ************************************************************************ */
-  /* Override specific member functions from IterableContainer                */
-  /* ************************************************************************ */
-
-  // ...
-
 }

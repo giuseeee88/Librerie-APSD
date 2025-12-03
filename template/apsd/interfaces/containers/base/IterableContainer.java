@@ -19,6 +19,4 @@ public interface IterableContainer<Data> extends TraversableContainer<Data>{ // 
   @Override
   boolean TraverseBackward(Predicate<Data> predicate);
 
-  // ...
-
 }

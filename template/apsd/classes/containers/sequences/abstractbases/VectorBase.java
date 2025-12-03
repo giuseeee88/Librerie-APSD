@@ -11,47 +11,43 @@ import apsd.interfaces.containers.sequences.Vector;
 /** Object: Abstract vector base implementation. */
 abstract public class VectorBase<Data> implements Vector<Data> { // Must implement Vector
 
-  // protected Data[] arr;
+  protected Data[] arr;
 
   // VectorBase
 
-  // NewVector
+  void NewVector(Data[] data) {
+	  arr = data;  
+  }
 
-  // @SuppressWarnings("unchecked")
-  // protected void ArrayAlloc(Natural newsize) {
-  //   long size = newsize.ToLong();
-  //   if (size >= Integer.MAX_VALUE) { throw new ArithmeticException("Overflow: size cannot exceed Integer.MAX_VALUE!"); }
-  //   arr = (Data[]) new Object[(int) size];
-  // }
-
-  /* ************************************************************************ */
-  /* Override specific member functions from ClearableContainer               */
-  /* ************************************************************************ */
-
-  // ...
-
-  /* ************************************************************************ */
-  /* Override specific member functions from ResizableContainer               */
-  /* ************************************************************************ */
-
-  // ...
-
-  /* ************************************************************************ */
-  /* Override specific member functions from IterableContainer                */
-  /* ************************************************************************ */
-
-  // ...
-
-  /* ************************************************************************ */
-  /* Override specific member functions from Sequence                         */
-  /* ************************************************************************ */
-
-  // ...
-
-  /* ************************************************************************ */
-  /* Override specific member functions from MutableSequence                  */
-  /* ************************************************************************ */
-
-  // ...
-
+  @SuppressWarnings("unchecked")
+  protected void ArrayAlloc(Natural newsize) {
+    long size = newsize.ToLong();
+    if (size >= Integer.MAX_VALUE) { throw new ArithmeticException("Overflow: size cannot exceed Integer.MAX_VALUE!"); }
+    arr = (Data[]) new Object[(int) size];
+  }
+  
+  @Override
+  public void Clear() {
+	
+  }
+  
+  @Override
+  public Natural Capacity() {
+  	
+  }
+  
+  @Override
+  public MutableForwardIterator<Data> FIterator() {
+	
+  }
+  
+  @Override
+  public MutableBackwardIterator<Data> BIterator() {
+	
+  }
+  
+  @Override
+  public MutableSequence<Data> SubSequence(Natural start, Natural end) {
+	
+  }
 }

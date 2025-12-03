@@ -6,7 +6,7 @@ import apsd.interfaces.containers.base.TraversableContainer;
 /** Object: Abstract (static) circular vector base implementation. */
 abstract public class CircularVectorBase<Data> extends VectorBase<Data>{ // Must extend VectorBase
 
-  // protected long start = 0L;
+  protected long start = 0L;
 
   // CircularVectorBase
 

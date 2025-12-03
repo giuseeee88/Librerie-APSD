@@ -10,5 +10,4 @@ public interface SortedSequence<Data extends Comparable<? super Data>> extends S
   
   @Override
   Natural Search(Data dat);
-
 }
