@@ -5,19 +5,7 @@ import apsd.classes.utilities.Natural;
 import apsd.interfaces.containers.base.TraversableContainer;
 
 /** Object: Concrete (static linear) vector implementation. */
-public class Vector<Data> extends LinearVectorBase{
-
-	@Override
-	public void Clear() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void Realloc(Natural newsize) {
-		// TODO Auto-generated method stub
-		
-	} // Must extend LinearVectorBase
+public class Vector<Data> extends LinearVectorBase<Data>{ // Must extend LinearVectorBase
 
   // public Vector()
 

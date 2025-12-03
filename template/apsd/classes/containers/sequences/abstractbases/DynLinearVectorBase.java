@@ -13,7 +13,7 @@ abstract public class DynLinearVectorBase<Data> extends LinearVectorBase<Data> i
   
   @Override
   public Natural Size() {
-	return new Natural(size);
+	  
   }
   
   @Override

@@ -16,29 +16,32 @@ import apsd.interfaces.traits.Predicate;
 /** Object: Abstract chain base implementation on linked-list. */
 abstract public class LLChainBase<Data> implements Chain<Data>{ // Must implement Chain
 
-  // protected final MutableNatural size = new MutableNatural();
-  // protected final Box<LLNode<Data>> headref = new Box<>();
-  // protected final Box<LLNode<Data>> tailref = new Box<>();
+   protected final MutableNatural size = new MutableNatural();
+   protected final Box<LLNode<Data>> headref = new Box<>();
+   protected final Box<LLNode<Data>> tailref = new Box<>();
 
-  // LLChainBase
+   // LLChainBase
 
-  // public LLChainBase(TraversableContainer<Data> con) {
-  //   size.Assign(con.Size());
-  //   final Box<Boolean> first = new Box<>(true);
-  //   con.TraverseForward(dat -> {
-  //     LLNode<Data> node = new LLNode<>(dat);
-  //     if (first.Get()) {
-  //       headref.Set(node);
-  //       first.Set(false);
-  //     } else {
-  //       tailref.Get().SetNext(node);
-  //     }
-  //     tailref.Set(node);
-  //     return false;
-  //   });
-  // }
+   public LLChainBase(TraversableContainer<Data> con) {
+     size.Assign(con.Size());
+     final Box<Boolean> first = new Box<>(true);
+     con.TraverseForward(dat -> {
+       LLNode<Data> node = new LLNode<>(dat);
+       if (first.Get()) {
+         headref.Set(node);
+         first.Set(false);
+       } else {
+         tailref.Get().SetNext(node);
+       }
+       tailref.Set(node);
+       return false;
+     });
+   }
 
-  // NewChain
+   // NewChain
+   public LLChainBase<Data> NewChain(long capacity, LLNode<Data> head, LLNode<Data> tail) {
+	   
+   }
 
   /* ************************************************************************ */
   /* Specific member functions from LLChainBase                               */

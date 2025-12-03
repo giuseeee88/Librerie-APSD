@@ -10,35 +10,44 @@ abstract public class DynCircularVectorBase<Data> extends CircularVectorBase<Dat
   protected long size = 0L;
 
   // DynCircularVectorBase
+  
+  @Override
+  public Natural Size() {
+	  
+  }
+  
+  @Override
+  public void Clear() {
+	  
+  }
+  
+  @Override
+  public void Realloc(Natural size) {
+	  
+  }
+  
+  @Override
+  public void Expand(Natural size) {
+	  
+  }
+  
+  @Override
+  public void Reduce(Natural size) {
+	  
+  }
+  
+  @Override
+  public void ShiftLeft(Natural start, Natural end) {
+	  
+  }
+  
+  @Override
+  public void ShiftRight(Natural start, Natural end) {
+	  
+  }
+  
+  @Override
+  public void ArrayAlloc(Natural newsize) {
 
-  /* ************************************************************************ */
-  /* Override specific member functions from Container                        */
-  /* ************************************************************************ */
-
-  // ...
-
-  /* ************************************************************************ */
-  /* Override specific member functions from ClearableContainer               */
-  /* ************************************************************************ */
-
-  // ...
-
-  /* ************************************************************************ */
-  /* Override specific member functions from ReallocableContainer             */
-  /* ************************************************************************ */
-
-  // ...
-
-  /* ************************************************************************ */
-  /* Override specific member functions from ResizableContainer               */
-  /* ************************************************************************ */
-
-  // ...
-
-  /* ************************************************************************ */
-  /* Specific member functions of Vector                                      */
-  /* ************************************************************************ */
-
-  // ...
-
+  }
 }

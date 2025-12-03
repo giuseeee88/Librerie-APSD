@@ -9,29 +9,34 @@ abstract public class CircularVectorBase<Data> extends VectorBase<Data>{ // Must
   protected long start = 0L;
 
   // CircularVectorBase
-
-  /* ************************************************************************ */
-  /* Override specific member functions from ReallocableContainer             */
-  /* ************************************************************************ */
-
-  // ...
-
-  /* ************************************************************************ */
-  /* Override specific member functions from Sequence                         */
-  /* ************************************************************************ */
-
-  // ...
-
-  /* ************************************************************************ */
-  /* Override specific member functions from MutableSequence                  */
-  /* ************************************************************************ */
-
-  // ...
-
-  /* ************************************************************************ */
-  /* Specific member functions of Vector                                      */
-  /* ************************************************************************ */
-
-  // ...
-
+  
+  @Override
+  public void Realloc(Natural n) {
+	  
+  }
+  
+  @Override
+  public Data GetAt(Natural n) {
+	  
+  }
+  
+  @Override
+  public void SetAt(Data dat, Natural n) {
+	  
+  }
+  
+  @Override
+  public void ShiftLeft(Natural start, Natural end) {
+	  
+  }
+  
+  @Override
+  public void ShiftRight(Natural start, Natural end) {
+	  
+  }
+  
+  @Override
+  public void ArrayAlloc(Natural n) {
+	  
+  }
 }

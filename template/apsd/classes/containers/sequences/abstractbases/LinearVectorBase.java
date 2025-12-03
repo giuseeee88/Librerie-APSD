@@ -7,23 +7,19 @@ import apsd.interfaces.containers.base.TraversableContainer;
 abstract public class LinearVectorBase<Data> extends VectorBase<Data> { // Must extend VectorBase
 
   // LinearVectorBase
-
-  /* ************************************************************************ */
-  /* Override specific member functions from ReallocableContainer             */
-  /* ************************************************************************ */
-
-  // ...
-
-  /* ************************************************************************ */
-  /* Override specific member functions from Sequence                         */
-  /* ************************************************************************ */
-
-  // ...
-
-  /* ************************************************************************ */
-  /* Override specific member functions from MutableSequence                  */
-  /* ************************************************************************ */
-
-  // ...
-
+	
+  @Override	
+  public void Realloc(Natural size) {
+		
+  }
+  
+  @Override	
+  public Data GetAt(Natural n) {
+		
+  }
+  
+  @Override	
+  public Data SetAt(Data dat, Natural n) {
+		
+  }
 }
