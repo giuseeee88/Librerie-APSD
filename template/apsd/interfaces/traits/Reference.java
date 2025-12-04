@@ -5,6 +5,8 @@ public interface Reference<Data> {
 
   Data Get();
 
-  default boolean IsNull() { return (Get() == null); }
+  default boolean IsNull() {
+	  return (Get() == null);
+  }
 
 }

@@ -2,25 +2,25 @@ package apsd.interfaces.containers.base;
 
 import apsd.classes.utilities.Natural;
 
-/** Interface: ReallocableContainer che è espandibile e riducibile. */
-public interface ResizableContainer extends ReallocableContainer { // Must extend ReallocableContainer
+public interface ResizableContainer extends ReallocableContainer {
 
-  double THRESHOLD_FACTOR = 2.0; // Must be strictly greater than 1.0
-  
+  double THRESHOLD_FACTOR = 2.0;
+
   void Expand();
+
   void Expand(Natural n);
+
   void Reduce();
+
   void Reduce(Natural n);
-  
+
   @Override
   Natural Size();
 
   @Override
   void Grow(Natural n);
 
-   @Override
-   default void Shrink() {
-     if ((long) (THRESHOLD_FACTOR * SHRINK_FACTOR * Size().ToLong()) <= Capacity().ToLong()) ReallocableContainer.super.Shrink();
-   }
+  @Override
+  void Shrink();
 
 }

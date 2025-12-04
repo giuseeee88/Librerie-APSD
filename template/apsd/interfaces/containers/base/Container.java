@@ -6,6 +6,7 @@ import apsd.classes.utilities.Natural;
 public interface Container {
 	
   Natural Size();
+  
   boolean IsEmpty();
   
 }

@@ -4,18 +4,17 @@ import apsd.interfaces.containers.iterators.BackwardIterator;
 import apsd.interfaces.containers.iterators.ForwardIterator;
 import apsd.interfaces.traits.Predicate;
 
-/** Interface: TraversableContainer con supporto all'iterazione. */
-public interface IterableContainer<Data> extends TraversableContainer<Data>{ // Must extend TraversableContainer
+public interface IterableContainer<Data> extends TraversableContainer<Data> {
 
   ForwardIterator<Data> FIterator();
-  
-  BackwardIterator<Data> BIterator();
 
-  boolean IsEqual(IterableContainer<Data> container);
+  BackwardIterator<Data> BIterator();
   
+  boolean IsEqual(IterableContainer<Data> container);
+
   @Override
   boolean TraverseForward(Predicate<Data> predicate);
-  
+
   @Override
   boolean TraverseBackward(Predicate<Data> predicate);
 
