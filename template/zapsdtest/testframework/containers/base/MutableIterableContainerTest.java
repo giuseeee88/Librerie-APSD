@@ -1,5 +1,6 @@
 package zapsdtest.testframework.containers.base;
 
+import apsd.classes.utilities.Natural;
 import apsd.interfaces.containers.base.MutableIterableContainer;
 import apsd.interfaces.containers.iterators.MutableForwardIterator;
 import apsd.interfaces.containers.iterators.MutableBackwardIterator;
@@ -15,7 +16,7 @@ public interface MutableIterableContainerTest<Data, Con extends MutableIterableC
       assertFalse(iterator.IsValid(), "Iterator is not valid");
     } else {
       assertTrue(iterator.IsValid(), "Iterator is valid");
-      iterator.Next(steps);
+      iterator.Next(Natural.Of(steps));
       assertTrue(iterator.IsValid(), "Iterator is valid");
       Data original = iterator.GetCurrent();
       iterator.SetCurrent(newElement);
@@ -34,7 +35,7 @@ public interface MutableIterableContainerTest<Data, Con extends MutableIterableC
       assertFalse(iterator.IsValid(), "Iterator is not valid");
     } else {
       assertTrue(iterator.IsValid(), "Iterator is valid");
-      iterator.Prev(steps);
+      iterator.Prev(Natural.Of(steps));
       assertTrue(iterator.IsValid(), "Iterator is valid");
       Data original = iterator.GetCurrent();
       iterator.SetCurrent(newElement);

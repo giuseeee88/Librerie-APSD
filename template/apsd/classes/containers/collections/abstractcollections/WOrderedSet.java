@@ -4,121 +4,62 @@ import apsd.classes.containers.collections.abstractcollections.bases.WOrderedSet
 import apsd.classes.containers.collections.concretecollections.VSortedChain;
 import apsd.interfaces.containers.base.IterableContainer;
 import apsd.interfaces.containers.base.TraversableContainer;
-import apsd.interfaces.containers.collections.Chain;
 import apsd.interfaces.containers.collections.Set;
 import apsd.interfaces.containers.collections.SortedChain;
 import apsd.interfaces.containers.iterators.ForwardIterator;
 
-/** Object: Wrapper ordered set implementation via ordered chain. */
+/** Object: Wrapper Ordered Set implementation via Sorted Chain (VSortedChain). */
 public class WOrderedSet<Data extends Comparable<? super Data>> extends WOrderedSetBase<Data, VSortedChain<Data>> {
 
-    /* --- Costruttori --- */
+    /* ************************************************************************ */
+    /* Costruttori                                                              */
+    /* ************************************************************************ */
 
     public WOrderedSet() {
         super();
-        // ChainAlloc viene chiamato implicitamente
     }
 
     public WOrderedSet(SortedChain<Data> chn) {
         super();
-        // Copiamo gli elementi assicurando l'unicità
-        ForwardIterator<Data> it = chn.FIterator();
-        while (!it.IsValid()) {
-            this.Insert(it.GetCurrent());
-            it.Next();
+        if (chn != null) {
+            ForwardIterator<Data> it = chn.FIterator();
+            while (it.IsValid()) { // CORRETTO: era !IsValid()
+                this.Insert(it.GetCurrent());
+                it.Next();
+            }
         }
     }
 
     public WOrderedSet(TraversableContainer<Data> con) {
         super();
-        this.InsertAll(con);
+        if (con != null) {
+            this.InsertAll(con);
+        }
     }
 
     public WOrderedSet(SortedChain<Data> chn, TraversableContainer<Data> con) {
         this(chn);
-        this.InsertAll(con);
+        if (con != null) {
+            this.InsertAll(con);
+        }
     }
 
-    /* --- Metodo di Allocazione --- */
+    /* ************************************************************************ */
+    /* Implementazione ChainAlloc                                               */
+    /* ************************************************************************ */
 
     @Override
     protected VSortedChain<Data> ChainAlloc() {
         return new VSortedChain<Data>();
     }
 
-    /* --- Metodi OrderedSet (Delegati alla catena ordinata) --- */
-
-    @Override
-    public Data Min() { // Corretto da min() a Min() per matchare Base/Interfaccia
-        return chn.Min();
-    }
-
-    @Override
-    public Data Max() { // Corretto da max() a Max() per matchare Base/Interfaccia
-        return chn.Max();
-    }
-
-    @Override
-    public void RemoveMin() {
-        chn.RemoveMin();
-    }
-
-    @Override
-    public void RemoveMax() {
-        chn.RemoveMax();
-    }
-
-    @Override
-    public Data MinNRemove() {
-        return chn.MinNRemove();
-    }
-
-    @Override
-    public Data MaxNRemove() {
-        return chn.MaxNRemove();
-    }
-
-    @Override
-    public Data Predecessor(Data dat) {
-        return chn.Predecessor(dat);
-    }
-
-    @Override
-    public Data Successor(Data dat) {
-        return chn.Successor(dat);
-    }
-
-    @Override
-    public void RemovePredecessor(Data dat) {
-        chn.RemovePredecessor(dat);
-    }
-
-    @Override
-    public void RemoveSuccessor(Data dat) {
-        chn.RemoveSuccessor(dat);
-    }
-
-    @Override
-    public Data PredecessorNRemove(Data dat) {
-        return chn.PredecessorNRemove(dat);
-    }
-
-    @Override
-    public Data SuccessorNRemove(Data dat) {
-        return chn.SuccessorNRemove(dat);
-    }
-
-    /* --- Metodi Set (Logica Insiemistica) --- */
-
-    @Override
-    public boolean Exists(Data dat) {
-        return chn.Exists(dat);
-    }
+    /* ************************************************************************ */
+    /* Metodi Set / OrderedSet                                                  */
+    /* ************************************************************************ */
 
     @Override
     public boolean Insert(Data dat) {
-        // Un Set non ammette duplicati. 
-        // VSortedChain gestisce l'ordinamento, noi gestiamo l'unicità.
+        // VSortedChain mantiene l'ordine, noi garantiamo l'unicità
         if (!chn.Exists(dat)) {
             chn.Insert(dat);
             return true;
@@ -127,16 +68,10 @@ public class WOrderedSet<Data extends Comparable<? super Data>> extends WOrdered
     }
 
     @Override
-    public boolean Remove(Data dat) {
-        return chn.Remove(dat);
-    }
-
-    @Override
     public void Union(Set<Data> set) {
-        // Unione: Aggiungi tutti gli elementi dell'altro set.
-        // Insert gestisce già i duplicati.
+        if (set == null) return;
         ForwardIterator<Data> it = set.FIterator();
-        while (!it.IsValid()) {
+        while (it.IsValid()) { // CORRETTO
             this.Insert(it.GetCurrent());
             it.Next();
         }
@@ -144,9 +79,9 @@ public class WOrderedSet<Data extends Comparable<? super Data>> extends WOrdered
 
     @Override
     public void Difference(Set<Data> set) {
-        // Differenza: Rimuovi gli elementi presenti nell'altro set.
+        if (set == null) return;
         ForwardIterator<Data> it = set.FIterator();
-        while (!it.IsValid()) {
+        while (it.IsValid()) { // CORRETTO
             this.Remove(it.GetCurrent());
             it.Next();
         }
@@ -154,53 +89,51 @@ public class WOrderedSet<Data extends Comparable<? super Data>> extends WOrdered
 
     @Override
     public void Intersection(Set<Data> set) {
-        // Intersezione: Mantieni solo gli elementi comuni.
-        // Identifichiamo gli elementi da rimuovere (quelli in THIS ma non in SET).
+        if (set == null) return;
+
+        // Usiamo VSortedChain per la lista temporanea (mantiene ordine, efficiente)
         VSortedChain<Data> toRemove = new VSortedChain<>();
         ForwardIterator<Data> it = this.FIterator();
-        
-        while (!it.IsValid()) {
+
+        while (it.IsValid()) {
             if (!set.Exists(it.GetCurrent())) {
                 toRemove.Insert(it.GetCurrent());
             }
             it.Next();
         }
-        
-        // Rimuoviamo in blocco per sicurezza
         this.RemoveAll(toRemove);
     }
 
     @Override
-    public boolean IsEqual(IterableContainer<Data> set) {
-        // 1. Check Dimensione
-        if (this.Size().compareTo(set.Size()) != 0) {
-            return false;
-        }
+    public boolean IsEqual(IterableContainer<Data> container) {
+        if (container == null) return false;
+        if (this.Size().compareTo(container.Size()) != 0) return false;
 
-        // 2. Check Elementi
-        // Poiché è un insieme ordinato, se l'altro container è ordinato potremmo ottimizzare,
-        // ma per sicurezza controlliamo l'esistenza generica.
+        // Poiché WOrderedSet è ordinato, se anche 'container' fosse ordinato,
+        // potremmo fare un confronto lineare O(N).
+        // Tuttavia, IterableContainer è generico, quindi usiamo il controllo standard.
+
         ForwardIterator<Data> it = this.FIterator();
-        while (!it.IsValid()) {
-            // Verifica manuale se 'set' non ha un metodo Exists efficiente esposto dall'interfaccia base
+        while (it.IsValid()) {
+            Data myData = it.GetCurrent();
             boolean found = false;
-            ForwardIterator<Data> otherIt = set.FIterator();
-            while(!otherIt.IsValid()){
-                if(otherIt.GetCurrent().compareTo(it.GetCurrent()) == 0){
-                    found = true;
-                    break;
+
+            if (container instanceof Set) {
+                 if (((Set<Data>)container).Exists(myData)) found = true;
+            } else {
+                ForwardIterator<Data> otherIt = container.FIterator();
+                while (otherIt.IsValid()) {
+                    if (myData.compareTo(otherIt.GetCurrent()) == 0) {
+                        found = true;
+                        break;
+                    }
+                    otherIt.Next();
                 }
-                otherIt.Next();
             }
-            
-            if(!found) return false;
+
+            if (!found) return false;
             it.Next();
         }
         return true;
-    }
-
-    @Override
-    public void Clear() {
-        chn.Clear();
     }
 }

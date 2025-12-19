@@ -7,7 +7,7 @@ import zapsdtest.testframework.containers.sequences.RemovableAtSequenceTest;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public interface ChainTest<Data, Con extends Chain<Data>> extends SetTest<Data, Con>, RemovableAtSequenceTest<Data, Con> {
+public interface ChainTest<Data, Con extends Chain<Data>> extends CollectionTest<Data, Con>, RemovableAtSequenceTest<Data, Con> {
 
   default void TestInsertIfAbsent(Data element, boolean shouldWork) {
     BeginTest("InsertIfAbsent");
