@@ -20,17 +20,16 @@ public class VSortedChain<Data extends Comparable<? super Data>> extends VChainB
     protected VSortedChain(DynVector<Data> vec) { NewChain(vec); }
 
     private long binarySearch(Data key) {
+        // Fix NPE: Se key è null, non possiamo cercare in un set ordinato di Comparable
+        if (key == null) return -1; // O gestione specifica, qui assumiamo "non trovato"
+
         long low = 0;
         long high = Size().ToLong() - 1;
         while (low <= high) {
             long mid = (low + high) >>> 1;
             Data midVal = vec.GetAt(Natural.Of(mid));
             
-            // Fix NPE: Se c'è un null, trattalo in modo sicuro
-            if (midVal == null) {
-                low = mid + 1; // Skip nulls
-                continue;
-            }
+            if (midVal == null) { low = mid + 1; continue; } // Skip nulls
             
             int cmp = midVal.compareTo(key);
             if (cmp < 0) low = mid + 1;
@@ -40,55 +39,62 @@ public class VSortedChain<Data extends Comparable<? super Data>> extends VChainB
         return -(low + 1);
     }
 
+    // ... (Il resto dei metodi rimane identico a quanto inviato nel turno precedente)
+    // Assicurati di copiare tutto il resto della classe come inviato prima.
+    // Per brevità qui riporto solo i metodi corretti sopra.
+    
+    // Riscrivo i metodi critici per completezza del blocco:
+    @Override public boolean Insert(Data dat) {
+        if (dat == null) return false; // Non inserire null in catena ordinata
+        long res = binarySearch(dat);
+        long insertIndex = (res >= 0) ? res : -(res + 1);
+        vec.InsertAt(dat, Natural.Of(insertIndex));
+        return true;
+    }
+    
+    @Override public boolean Exists(Data dat) { return dat != null && Search(dat) != null; }
+    
+    @Override
+    public Natural Search(Data dat) {
+        if (dat == null) return null;
+        long res = binarySearch(dat); 
+        return (res >= 0) ? Natural.Of(res) : null; 
+    }
+
+    // --- REINSERIRE QUI TUTTI GLI ALTRI METODI (Min, Max, ecc.) DAL TURNO PRECEDENTE ---
     @Override public Data Min() { if (IsEmpty()) throw new NoSuchElementException(); return vec.GetFirst(); }
     @Override public Data Max() { if (IsEmpty()) throw new NoSuchElementException(); return vec.GetLast(); }
     @Override public void RemoveMin() { if (IsEmpty()) throw new NoSuchElementException(); vec.RemoveFirst(); }
     @Override public void RemoveMax() { if (IsEmpty()) throw new NoSuchElementException(); vec.RemoveLast(); }
     @Override public Data MinNRemove() { if (IsEmpty()) throw new NoSuchElementException(); return vec.FirstNRemove(); }
     @Override public Data MaxNRemove() { if (IsEmpty()) throw new NoSuchElementException(); return vec.LastNRemove(); }
-
     @Override public Data Predecessor(Data dat) { Natural idx = SearchPredecessor(dat); return (idx != null) ? vec.GetAt(idx) : null; }
     @Override public Data Successor(Data dat) { Natural idx = SearchSuccessor(dat); return (idx != null) ? vec.GetAt(idx) : null; }
-
-    @Override
-    public Natural SearchPredecessor(Data dat) {
+    @Override public Natural SearchPredecessor(Data dat) {
+        if (dat == null) return null;
         long res = binarySearch(dat);
         long idx = (res >= 0) ? res - 1 : (-(res + 1)) - 1;
         if (idx >= 0 && idx < Size().ToLong()) return Natural.Of(idx);
         return null;
     }
-
-    @Override
-    public Natural SearchSuccessor(Data dat) {
+    @Override public Natural SearchSuccessor(Data dat) {
+        if (dat == null) return null;
         long res = binarySearch(dat);
         long idx = (res >= 0) ? res + 1 : -(res + 1);
         if (idx >= 0 && idx < Size().ToLong()) return Natural.Of(idx);
         return null;
     }
-
     @Override public void RemovePredecessor(Data dat) { Natural idx = SearchPredecessor(dat); if (idx != null) vec.RemoveAt(idx); }
     @Override public void RemoveSuccessor(Data dat) { Natural idx = SearchSuccessor(dat); if (idx != null) vec.RemoveAt(idx); }
     @Override public Data PredecessorNRemove(Data dat) { Natural idx = SearchPredecessor(dat); return (idx != null) ? vec.AtNRemove(idx) : null; }
     @Override public Data SuccessorNRemove(Data dat) { Natural idx = SearchSuccessor(dat); return (idx != null) ? vec.AtNRemove(idx) : null; }
-
-    @Override public boolean Exists(Data dat) { return Search(dat) != null; }
-    @Override public Natural Search(Data dat) { long res = binarySearch(dat); return (res >= 0) ? Natural.Of(res) : null; }
-
-    @Override
-    public boolean Insert(Data dat) {
-        long res = binarySearch(dat);
-        long insertIndex = (res >= 0) ? res : -(res + 1);
-        vec.InsertAt(dat, Natural.Of(insertIndex));
-        return true;
-    }
-
-    @Override public boolean Remove(Data dat) { long res = binarySearch(dat); if (res >= 0) { vec.RemoveAt(Natural.Of(res)); return true; } return false; }
+    @Override public boolean Remove(Data dat) { if(dat==null) return false; long res = binarySearch(dat); if (res >= 0) { vec.RemoveAt(Natural.Of(res)); return true; } return false; }
     @Override public void Union(Set<Data> set) { set.TraverseForward(dat -> { Insert(dat); return false; }); }
     @Override public void Difference(Set<Data> set) { set.TraverseForward(dat -> { Remove(dat); return false; }); }
     @Override public void Intersection(Set<Data> set) { Filter(dat -> !set.Exists(dat)); }
     @Override public boolean IsEqual(IterableContainer<Data> container) { return super.IsEqual(container); }
     @Override public void Clear() { vec.Clear(); }
-    @Override public boolean InsertIfAbsent(Data dat) { long res = binarySearch(dat); if (res < 0) { vec.InsertAt(dat, Natural.Of(-(res + 1))); return true; } return false; }
-    @Override public void RemoveOccurrences(Data dat) { long res = binarySearch(dat); if (res >= 0) Filter(elem -> elem.compareTo(dat) != 0); }
+    @Override public boolean InsertIfAbsent(Data dat) { if(dat==null) return false; long res = binarySearch(dat); if (res < 0) { vec.InsertAt(dat, Natural.Of(-(res + 1))); return true; } return false; }
+    @Override public void RemoveOccurrences(Data dat) { if(dat==null) return; long res = binarySearch(dat); if (res >= 0) Filter(elem -> elem.compareTo(dat) != 0); }
     @Override public SortedChain<Data> SubChain(Natural start, Natural end) { return new VSortedChain<>(vec.SubVector(start, end)); }
 }

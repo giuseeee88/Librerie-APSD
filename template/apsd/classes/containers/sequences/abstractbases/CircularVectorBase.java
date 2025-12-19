@@ -13,8 +13,8 @@ abstract public class CircularVectorBase<Data> extends VectorBase<Data> {
     long newCap = n.ToLong();
     Data[] newArr = (Data[]) new Object[(int) newCap];
 
-    // Copia solo se la vecchia capacità > 0 e ci sono elementi da copiare.
-    // IMPORTANTE: il limite è il minimo tra size attuale e nuova capacità (per gestire shrink).
+    // Linearizzazione: Copia elementi.
+    // Usiamo limit = min(sz, newCap) per supportare anche lo Shrink senza crash.
     long limit = (sz < newCap) ? sz : newCap;
 
     if (Capacity().ToLong() > 0 && limit > 0) {
@@ -30,7 +30,7 @@ abstract public class CircularVectorBase<Data> extends VectorBase<Data> {
   @Override
   public Data GetAt(Natural n) {
     long cap = Capacity().ToLong();
-    // Fix: Se cap è 0, non possiamo fare modulo. È sempre OutOfBounds.
+    // Prevenzione ArithmeticException e Bounds Check
     if (cap == 0 || n.compareTo(Size()) >= 0) {
         throw new IndexOutOfBoundsException("Index " + n + " out of bounds (Size: " + Size() + ")");
     }
@@ -42,7 +42,6 @@ abstract public class CircularVectorBase<Data> extends VectorBase<Data> {
   @Override
   public void SetAt(Data dat, Natural n) {
     long cap = Capacity().ToLong();
-    // Fix: Se cap è 0, non possiamo fare modulo. È sempre OutOfBounds.
     if (cap == 0 || n.compareTo(Size()) >= 0) {
         throw new IndexOutOfBoundsException("Index " + n + " out of bounds (Size: " + Size() + ")");
     }

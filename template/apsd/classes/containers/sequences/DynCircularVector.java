@@ -23,6 +23,7 @@ public class DynCircularVector<Data> extends DynCircularVectorBase<Data> {
             long idx = 0;
             @Override
             public boolean Apply(Data dat) {
+                // Scrittura diretta per inizializzazione
                 rawSet(dat, idx++);
                 return false;
             }
@@ -38,10 +39,10 @@ public class DynCircularVector<Data> extends DynCircularVectorBase<Data> {
         return new DynCircularVector<>(arr);
     }
 
-    // Helper per accesso diretto all'array (bypass controlli Size, rispetta solo Capacity)
+    // Helper: Accesso fisico diretto (ignora Size, rispetta Capacity)
     private void rawSet(Data dat, long logicalIdx) {
         long cap = Capacity().ToLong();
-        if (cap == 0) return; 
+        if (cap == 0) return;
         long physicalIdx = (start + logicalIdx) % cap;
         arr[(int) physicalIdx] = dat;
     }
@@ -56,14 +57,14 @@ public class DynCircularVector<Data> extends DynCircularVectorBase<Data> {
     @Override
     public void InsertAt(Data dat, Natural pos) {
         long idx = pos.ToLong();
-        // Permettiamo inserimento in coda (idx == size)
+        // idx == size è valido per append
         if (idx < 0 || idx > size) throw new IndexOutOfBoundsException("Index: " + idx + ", Size: " + size);
 
         if (size >= Capacity().ToLong()) {
             Grow();
         }
 
-        // Shift a destra usando rawSet/rawGet
+        // Shift a destra usando rawSet per poter scrivere in posizioni >= size
         for (long i = size; i > idx; i--) {
             rawSet(rawGet(i - 1), i);
         }
@@ -85,7 +86,7 @@ public class DynCircularVector<Data> extends DynCircularVectorBase<Data> {
         }
 
         size--;
-        rawSet(null, size); // Pulisce riferimento
+        rawSet(null, size); // Clean up
         return removed;
     }
 
@@ -124,16 +125,17 @@ public class DynCircularVector<Data> extends DynCircularVectorBase<Data> {
     @Override
     public void Reduce(Natural n) {
         long dec = n.ToLong();
-        if (dec > size) throw new IllegalArgumentException("Reduce amount > size");
+        if (dec > size) throw new IllegalArgumentException("Reduce > size");
         for (long i = size - dec; i < size; i++) {
             rawSet(null, i);
         }
         size -= dec;
     }
 
-    // Alias e implementazioni standard
+    // Alias
     @Override public void Expand() { Expand(Natural.ONE); }
     @Override public void Reduce() { Reduce(Natural.ONE); }
+    
     @Override public boolean IsEmpty() { return size == 0; }
     
     @Override public Data GetFirst() { 
@@ -190,8 +192,7 @@ public class DynCircularVector<Data> extends DynCircularVectorBase<Data> {
     @Override public Data GetNSetLast(Data dat) { if(size==0) throw new IndexOutOfBoundsException(); return GetNSetAt(dat, Natural.Of(size-1)); }
     @Override public void Swap(Natural pos1, Natural pos2) { Data tmp = GetAt(pos1); SetAt(GetAt(pos2), pos1); SetAt(tmp, pos2); }
 
-    @Override
-    public void Clear() {
+    @Override public void Clear() {
         super.Clear(); 
         size = 0;
         start = 0;
