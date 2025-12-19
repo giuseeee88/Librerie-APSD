@@ -7,7 +7,6 @@ import apsd.interfaces.containers.sequences.MutableSequence;
 import apsd.interfaces.containers.sequences.Vector;
 import apsd.interfaces.traits.Predicate;
 
-/** Object: Abstract vector base implementation. */
 abstract public class VectorBase<Data> implements Vector<Data> {
 
   protected Data[] arr;
@@ -19,6 +18,7 @@ abstract public class VectorBase<Data> implements Vector<Data> {
   @SuppressWarnings("unchecked")
   protected void ArrayAlloc(Natural newsize) {
     long size = newsize.ToLong();
+    // Controllo overflow intero
     if (size > Integer.MAX_VALUE) {
       throw new ArithmeticException("Size too large for array allocation");
     }
@@ -32,6 +32,7 @@ abstract public class VectorBase<Data> implements Vector<Data> {
         arr[i] = null;
       }
     }
+    // Nota: Le sottoclassi dinamiche devono resettare 'size' a 0.
   }
 
   @Override
@@ -42,33 +43,33 @@ abstract public class VectorBase<Data> implements Vector<Data> {
   @Override
   public MutableForwardIterator<Data> FIterator() {
     return new MutableForwardIterator<Data>() {
-      protected Natural current = new Natural(0);
+      protected long current = 0; // Usiamo long per efficienza e per evitare problemi con Natural nei loop
 
       @Override
       public boolean IsValid() {
-        return current.compareTo(Size()) < 0;
+        return current < Size().ToLong();
       }
 
       @Override
       public Data GetCurrent() {
         if (!IsValid()) throw new IllegalStateException("Iterator out of bounds");
-        return GetAt(current);
+        return GetAt(new Natural(current));
       }
 
       @Override
       public void SetCurrent(Data dat) {
         if (!IsValid()) throw new IllegalStateException("Iterator out of bounds");
-        SetAt(dat, current);
+        SetAt(dat, new Natural(current));
       }
 
       @Override
       public void Next() {
-        current = current.Increment();
+        current++;
       }
 
       @Override
       public void Next(Natural n) {
-         current = Natural.Of(current.ToLong() + n.ToLong());
+         current += n.ToLong();
       }
 
       @Override
@@ -80,7 +81,7 @@ abstract public class VectorBase<Data> implements Vector<Data> {
 
       @Override
       public void Reset() {
-        current = new Natural(0);
+        current = 0;
       }
     };
   }
@@ -109,7 +110,7 @@ abstract public class VectorBase<Data> implements Vector<Data> {
 
       @Override
       public void Prev() {
-        if (current >= 0) current--;
+        current--;
       }
 
       @Override
@@ -131,21 +132,19 @@ abstract public class VectorBase<Data> implements Vector<Data> {
 
       @Override
       public boolean ForEachBackward(Predicate<Data> predicate) {
-        if (predicate != null) {
-            while (IsValid()) {
-                if (predicate.Apply(DataNPrev())) { return true; }
-            }
-        }
-        return false;
+         if (predicate != null) {
+             while (IsValid()) {
+                 if (predicate.Apply(DataNPrev())) { return true; }
+             }
+         }
+         return false;
       }
     };
   }
 
   @Override
   public MutableSequence<Data> SubSequence(Natural start, Natural end) {
-    if (start.compareTo(end) > 0 || end.compareTo(Size()) > 0) {
-        throw new IndexOutOfBoundsException("Invalid SubSequence indices");
-    }
+    // Implementazione vuota/stub, le concrete lo gestiscono
     return null; 
   }
 }
