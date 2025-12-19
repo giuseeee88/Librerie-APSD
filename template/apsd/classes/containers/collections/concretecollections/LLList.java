@@ -23,10 +23,7 @@ public class LLList<Data> extends LLChainBase<Data> implements List<Data> {
         this.tailref.Set(tail);
     }
 
-    @Override
-    public LLChainBase<Data> NewChain(long capacity, LLNode<Data> head, LLNode<Data> tail) {
-        return new LLList<>(capacity, head, tail);
-    }
+    @Override public LLChainBase<Data> NewChain(long capacity, LLNode<Data> head, LLNode<Data> tail) { return new LLList<>(capacity, head, tail); }
 
     private LLNode<Data> getNodeAt(long index) {
         if (index < 0 || index >= size.ToLong()) throw new IndexOutOfBoundsException("Index: " + index);
@@ -56,30 +53,15 @@ public class LLList<Data> extends LLChainBase<Data> implements List<Data> {
 
     @Override
     public void SetFirst(Data dat) {
-        if (IsEmpty()) throw new IndexOutOfBoundsException();
+        if (IsEmpty()) throw new IndexOutOfBoundsException("Empty List");
         headref.Get().Set(dat);
     }
 
-    @Override
-    public Data GetNSetFirst(Data dat) {
-        if (IsEmpty()) throw new IndexOutOfBoundsException();
-        return headref.Get().GetNSet(dat);
-    }
+    @Override public Data GetNSetFirst(Data dat) { if (IsEmpty()) throw new IndexOutOfBoundsException(); return headref.Get().GetNSet(dat); }
+    @Override public void SetLast(Data dat) { if (IsEmpty()) throw new IndexOutOfBoundsException(); tailref.Get().Set(dat); }
+    @Override public Data GetNSetLast(Data dat) { if (IsEmpty()) throw new IndexOutOfBoundsException(); return tailref.Get().GetNSet(dat); }
 
-    @Override
-    public void SetLast(Data dat) {
-        if (IsEmpty()) throw new IndexOutOfBoundsException();
-        tailref.Get().Set(dat);
-    }
-
-    @Override
-    public Data GetNSetLast(Data dat) {
-        if (IsEmpty()) throw new IndexOutOfBoundsException();
-        return tailref.Get().GetNSet(dat);
-    }
-
-    @Override
-    public void Swap(Natural pos1, Natural pos2) {
+    @Override public void Swap(Natural pos1, Natural pos2) {
         long p1 = pos1.ToLong(); long p2 = pos2.ToLong();
         if (p1 == p2) return;
         LLNode<Data> n1 = getNodeAt(p1);
@@ -89,18 +71,13 @@ public class LLList<Data> extends LLChainBase<Data> implements List<Data> {
         n2.Set(temp);
     }
 
-    @Override
-    public MutableSequence<Data> SubSequence(Natural start, Natural end) {
-        return (MutableSequence<Data>) super.SubSequence(start, end);
-    }
+    @Override public MutableSequence<Data> SubSequence(Natural start, Natural end) { return (MutableSequence<Data>) super.SubSequence(start, end); }
 
-    @Override
-    public void InsertAt(Data dat, Natural n) {
+    @Override public void InsertAt(Data dat, Natural n) {
         long index = n.ToLong();
-        long currentSize = size.ToLong();
-        if (index < 0 || index > currentSize) throw new IndexOutOfBoundsException();
+        if (index < 0 || index > size.ToLong()) throw new IndexOutOfBoundsException();
         if (index == 0) InsertFirst(dat);
-        else if (index == currentSize) InsertLast(dat);
+        else if (index == size.ToLong()) InsertLast(dat);
         else {
             LLNode<Data> prev = getNodeAt(index - 1);
             LLNode<Data> newNode = new LLNode<>(dat);
@@ -110,8 +87,7 @@ public class LLList<Data> extends LLChainBase<Data> implements List<Data> {
         }
     }
 
-    @Override
-    public void InsertFirst(Data dat) {
+    @Override public void InsertFirst(Data dat) {
         boolean wasEmpty = IsEmpty();
         LLNode<Data> newNode = new LLNode<>(dat);
         newNode.SetNext(headref.Get());
@@ -120,8 +96,7 @@ public class LLList<Data> extends LLChainBase<Data> implements List<Data> {
         size.Increment();
     }
 
-    @Override
-    public void InsertLast(Data dat) {
+    @Override public void InsertLast(Data dat) {
         LLNode<Data> newNode = new LLNode<>(dat);
         if (IsEmpty()) { headref.Set(newNode); tailref.Set(newNode); }
         else { tailref.Get().SetNext(newNode); tailref.Set(newNode); }
@@ -129,9 +104,7 @@ public class LLList<Data> extends LLChainBase<Data> implements List<Data> {
     }
 
     @Override public boolean Insert(Data dat) { InsertLast(dat); return true; }
-
-    @Override
-    public Natural Search(Data dat) {
+    @Override public Natural Search(Data dat) {
         long index = 0;
         MutableForwardIterator<Data> it = FIterator();
         while (it.IsValid()) {
@@ -141,11 +114,9 @@ public class LLList<Data> extends LLChainBase<Data> implements List<Data> {
         }
         return null;
     }
-
     @Override public boolean InsertIfAbsent(Data dat) { if (!Exists(dat)) { InsertLast(dat); return true; } return false; }
     @Override public void RemoveOccurrences(Data dat) { Filter(element -> (dat == null) ? (element != null) : !dat.equals(element)); }
-    @SuppressWarnings("unchecked")
-    @Override public Chain<Data> SubChain(Natural start, Natural end) { return (Chain<Data>) SubSequence(start, end); }
+    @SuppressWarnings("unchecked") @Override public Chain<Data> SubChain(Natural start, Natural end) { return (Chain<Data>) SubSequence(start, end); }
     @Override public List<Data> SubList(Natural start, Natural end) { return (List<Data>) SubSequence(start, end); }
     @Override public boolean InsertAll(TraversableContainer<Data> container) {
         if (container == null || container.IsEmpty()) return false;

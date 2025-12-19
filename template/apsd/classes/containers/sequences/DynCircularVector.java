@@ -38,10 +38,10 @@ public class DynCircularVector<Data> extends DynCircularVectorBase<Data> {
         return new DynCircularVector<>(arr);
     }
 
-    // Helper per accesso diretto all'array fisico (ignora i check su Size, ma rispetta Capacity)
+    // Helper per accesso diretto all'array (bypass controlli Size, rispetta solo Capacity)
     private void rawSet(Data dat, long logicalIdx) {
         long cap = Capacity().ToLong();
-        if (cap == 0) return;
+        if (cap == 0) return; 
         long physicalIdx = (start + logicalIdx) % cap;
         arr[(int) physicalIdx] = dat;
     }
@@ -56,14 +56,14 @@ public class DynCircularVector<Data> extends DynCircularVectorBase<Data> {
     @Override
     public void InsertAt(Data dat, Natural pos) {
         long idx = pos.ToLong();
+        // Permettiamo inserimento in coda (idx == size)
         if (idx < 0 || idx > size) throw new IndexOutOfBoundsException("Index: " + idx + ", Size: " + size);
 
-        // Se l'array è pieno, espandiamo
         if (size >= Capacity().ToLong()) {
             Grow();
         }
 
-        // Shift a destra per fare spazio (usiamo rawSet/Get per non incappare nei limiti di Size)
+        // Shift a destra usando rawSet/rawGet
         for (long i = size; i > idx; i--) {
             rawSet(rawGet(i - 1), i);
         }
@@ -85,7 +85,7 @@ public class DynCircularVector<Data> extends DynCircularVectorBase<Data> {
         }
 
         size--;
-        rawSet(null, size); // Pulisci l'elemento residuo
+        rawSet(null, size); // Pulisce riferimento
         return removed;
     }
 
@@ -124,16 +124,16 @@ public class DynCircularVector<Data> extends DynCircularVectorBase<Data> {
     @Override
     public void Reduce(Natural n) {
         long dec = n.ToLong();
-        if (dec > size) throw new IllegalArgumentException("Cannot reduce more than size");
+        if (dec > size) throw new IllegalArgumentException("Reduce amount > size");
         for (long i = size - dec; i < size; i++) {
             rawSet(null, i);
         }
         size -= dec;
     }
 
+    // Alias e implementazioni standard
     @Override public void Expand() { Expand(Natural.ONE); }
     @Override public void Reduce() { Reduce(Natural.ONE); }
-    
     @Override public boolean IsEmpty() { return size == 0; }
     
     @Override public Data GetFirst() { 
@@ -192,7 +192,7 @@ public class DynCircularVector<Data> extends DynCircularVectorBase<Data> {
 
     @Override
     public void Clear() {
-        super.Clear(); // Pulisce array
+        super.Clear(); 
         size = 0;
         start = 0;
     }

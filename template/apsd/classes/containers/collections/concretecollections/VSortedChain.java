@@ -26,11 +26,9 @@ public class VSortedChain<Data extends Comparable<? super Data>> extends VChainB
             long mid = (low + high) >>> 1;
             Data midVal = vec.GetAt(Natural.Of(mid));
             
-            // Sicurezza contro null elements nel vettore
+            // Fix NPE: Se c'è un null, trattalo in modo sicuro
             if (midVal == null) {
-                // Se troviamo un null in un SortedChain, c'è un problema di integrità.
-                // Trattiamolo come minore di key per spingere la ricerca verso destra o skip.
-                low = mid + 1; 
+                low = mid + 1; // Skip nulls
                 continue;
             }
             
@@ -42,41 +40,12 @@ public class VSortedChain<Data extends Comparable<? super Data>> extends VChainB
         return -(low + 1);
     }
 
-    @Override
-    public Data Min() {
-        if (IsEmpty()) throw new NoSuchElementException("Chain is empty");
-        return vec.GetFirst();
-    }
-
-    @Override
-    public Data Max() {
-        if (IsEmpty()) throw new NoSuchElementException("Chain is empty");
-        return vec.GetLast();
-    }
-
-    @Override
-    public void RemoveMin() {
-        if (IsEmpty()) throw new NoSuchElementException("Chain is empty");
-        vec.RemoveFirst();
-    }
-
-    @Override
-    public void RemoveMax() {
-        if (IsEmpty()) throw new NoSuchElementException("Chain is empty");
-        vec.RemoveLast();
-    }
-
-    @Override
-    public Data MinNRemove() {
-        if (IsEmpty()) throw new NoSuchElementException("Chain is empty");
-        return vec.FirstNRemove();
-    }
-
-    @Override
-    public Data MaxNRemove() {
-        if (IsEmpty()) throw new NoSuchElementException("Chain is empty");
-        return vec.LastNRemove();
-    }
+    @Override public Data Min() { if (IsEmpty()) throw new NoSuchElementException(); return vec.GetFirst(); }
+    @Override public Data Max() { if (IsEmpty()) throw new NoSuchElementException(); return vec.GetLast(); }
+    @Override public void RemoveMin() { if (IsEmpty()) throw new NoSuchElementException(); vec.RemoveFirst(); }
+    @Override public void RemoveMax() { if (IsEmpty()) throw new NoSuchElementException(); vec.RemoveLast(); }
+    @Override public Data MinNRemove() { if (IsEmpty()) throw new NoSuchElementException(); return vec.FirstNRemove(); }
+    @Override public Data MaxNRemove() { if (IsEmpty()) throw new NoSuchElementException(); return vec.LastNRemove(); }
 
     @Override public Data Predecessor(Data dat) { Natural idx = SearchPredecessor(dat); return (idx != null) ? vec.GetAt(idx) : null; }
     @Override public Data Successor(Data dat) { Natural idx = SearchSuccessor(dat); return (idx != null) ? vec.GetAt(idx) : null; }
