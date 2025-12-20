@@ -9,341 +9,217 @@ import apsd.interfaces.traits.Predicate;
 /** Object: Concrete dynamic (linear) vector implementation. */
 public class DynVector<Data> extends DynLinearVectorBase<Data> {
 
-    // Costruttore vuoto
-    public DynVector() {
-        this(Natural.ZERO);
-    }
+    // Costruttori
+    public DynVector() { this(Natural.ZERO); }
 
-    // Costruttore con dimensione iniziale
     public DynVector(Natural inisize) {
         Realloc(inisize);
-        // Size rimane 0 (inizializzata in base), Capacity diventa inisize
+        this.size = 0; // Inizia vuoto
     }
 
-    // Costruttore da container
     public DynVector(TraversableContainer<Data> con) {
         Realloc(con.Size());
-        con.TraverseForward(new Predicate<Data>() {
-            @Override
-            public boolean Apply(Data dat) {
-                InsertLast(dat);
-                return false; // Continua l'attraversamento
-            }
-        });
+        con.TraverseForward(dat -> { InsertLast(dat); return false; });
     }
 
-    // Costruttore protetto (wrap array)
     protected DynVector(Data[] arr) {
         NewVector(arr);
         this.size = (arr != null) ? arr.length : 0;
     }
 
-    // Factory statico (rinominato Wrap per evitare name clash)
     public static <Data> DynVector<Data> Wrap(Data[] arr) {
         return new DynVector<>(arr);
     }
 
     /* ************************************************************************ */
-    /* Metodi di Modifica Strutturale (Insert/Remove/Shift)                     */
+    /* Metodi di Modifica Strutturale (Adattati ai Test)                        */
     /* ************************************************************************ */
+
+    /**
+     * ShiftRight ora deve:
+     * 1. Espandere il vettore se necessario.
+     * 2. Spostare gli elementi.
+     * 3. Incrementare la size.
+     */
+    @Override
+    public void ShiftRight(Natural start, Natural n) {
+        // 1. Expand preventivo
+        Expand(n);
+        
+        // 2. Shift fisico (implementazione base/default)
+        // Nota: chiamiamo super.ShiftRight o usiamo logica manuale se la base non lo supporta.
+        // Poiché VectorBase::ShiftRight usa GetAt/SetAt basati su size, e noi stiamo aumentando size,
+        // dobbiamo stare attenti. VectorBase::ShiftRight usa Size(). 
+        // Ma qui la size logica non è ancora aumentata. 
+        // Implementiamo manualmente lo shift fisico per sicurezza sui raw data.
+        
+        long s = start.ToLong();
+        long d = n.ToLong();
+        long limit = size; // Vecchia size
+
+        // Spostiamo da (limit-1) a (s) verso destra di d posizioni
+        for (long i = limit - 1; i >= s; i--) {
+            SetAt(GetAt(Natural.Of(i)), Natural.Of(i + d));
+        }
+        // Puliamo il buco creato
+        for (long i = s; i < s + d; i++) {
+            SetAt(null, Natural.Of(i));
+        }
+        
+        // 3. Incremento Size
+        size += d;
+    }
+
+    /**
+     * ShiftLeft ora deve:
+     * 1. Spostare gli elementi.
+     * 2. Decrementare la size.
+     * 3. Ridurre la memoria (Reduce) se necessario.
+     */
+    @Override
+    public void ShiftLeft(Natural start, Natural n) {
+        long s = start.ToLong();
+        long d = n.ToLong();
+        long limit = size;
+
+        if (s + d > limit) return; // O throw
+
+        // 1. Shift fisico
+        for (long i = s; i < limit - d; i++) {
+            SetAt(GetAt(Natural.Of(i + d)), Natural.Of(i));
+        }
+        // Puliamo la coda (che verrà tagliata dalla size, ma per pulizia memoria)
+        for (long i = limit - d; i < limit; i++) {
+            SetAt(null, Natural.Of(i));
+        }
+
+        // 2. Decremento Size
+        size -= d;
+
+        // 3. Reduce automatico (richiesto dai test)
+        Reduce();
+    }
 
     @Override
     public void InsertAt(Data dat, Natural pos) {
-        if (pos.compareTo(Size()) > 0) throw new IndexOutOfBoundsException("Insert index out of bounds");
+        if (pos.compareTo(Size()) > 0) throw new IndexOutOfBoundsException();
 
-        // Se siamo pieni, espandiamo
-        if (Size().compareTo(Capacity()) >= 0) {
-            Expand();
-        }
-
-        // Spostiamo a destra per fare spazio, partendo dalla fine fino a pos
-        if (pos.compareTo(Size()) < 0) {
-            ShiftRight(pos, Natural.ONE);
-        }
-
-        // Inseriamo e incrementiamo size
+        // Delega tutto a ShiftRight (che fa Expand e size++)
+        ShiftRight(pos, Natural.ONE);
+        
+        // Scrive il dato
         SetAt(dat, pos);
-        size++;
     }
 
     @Override
     public Data AtNRemove(Natural pos) {
-        if (pos.compareTo(Size()) >= 0) throw new IndexOutOfBoundsException("Remove index out of bounds");
+        if (pos.compareTo(Size()) >= 0) throw new IndexOutOfBoundsException();
 
         Data removed = GetAt(pos);
 
-        // Spostiamo a sinistra per coprire il buco
-        if (pos.compareTo(Size().Decrement()) < 0) {
-            ShiftLeft(pos.Increment(), Natural.ONE);
-        }
-
-        // Decrementiamo size e annulliamo l'ultimo elemento (ora duplicato)
-        size--;
-        SetAt(null, Size()); // Size() ritorna la nuova dimensione, che ora punta alla vecchia "fine"
-
-        // Riduciamo se necessario (opzionale, ma buona pratica per DynVector)
-        // Shrink(); 
+        // Delega tutto a ShiftLeft (che fa size-- e Reduce)
+        // ShiftLeft a partire da pos, di 1 posizione. 
+        // Questo sovrascrive 'pos' con 'pos+1' e accorcia la lista.
+        ShiftLeft(pos, Natural.ONE);
 
         return removed;
     }
 
-    @Override
-    public void ShiftLeft(Natural start, Natural n) {
-        // Shift logico degli elementi a sinistra
-        // Nota: Questo metodo sposta i dati ma NON cambia la 'size' del vettore 
-        // a meno che non sia usato internamente da Remove.
-        // Se usato come operazione pubblica di MutableSequence, sovrascrive.
-        
-        long s = start.ToLong();
-        long d = n.ToLong();
-        long limit = Size().ToLong();
-
-        if (s + d >= limit) return;
-
-        for (long i = s; i < limit - d; i++) {
-            SetAt(GetAt(Natural.Of(i + d)), Natural.Of(i));
-        }
-        // Pulizia coda
-        for (long i = limit - d; i < limit; i++) {
-            SetAt(null, Natural.Of(i));
-        }
-    }
-
-    @Override
-    public void ShiftRight(Natural start, Natural n) {
-        long s = start.ToLong();
-        long d = n.ToLong();
-        long limit = Size().ToLong();
-
-        // Controllo capacità: shift right potrebbe spingere elementi fuori o richiedere resize?
-        // In MutableSequence solitamente shift perde elementi o è confinato.
-        // Qui assumiamo shift interno senza resize automatico (a meno di Insert).
-        
-        if (s + d >= limit) return; // O throw, dipende dalla specifica
-
-        for (long i = limit - 1; i >= s + d; i--) {
-            SetAt(GetAt(Natural.Of(i - d)), Natural.Of(i));
-        }
-        // Pulizia testa
-        for (long i = s; i < s + d; i++) {
-            SetAt(null, Natural.Of(i));
-        }
-    }
-    
-    // Alias per Shift
+    // Alias per compatibilità interfaccia
     @Override public void ShiftLeft(Natural n) { ShiftLeft(Natural.ZERO, n); }
     @Override public void ShiftFirstLeft() { ShiftLeft(Natural.ONE); }
-    @Override public void ShiftLastLeft() { ShiftLeft(Size().Decrement(), Natural.ONE); } // Poco utile, sposta solo l'ultimo su se stesso o fuori? Spesso inteso shift(N-1, 1)
-
+    @Override public void ShiftLastLeft() { ShiftLeft(Size().Decrement(), Natural.ONE); }
     @Override public void ShiftRight(Natural n) { ShiftRight(Natural.ZERO, n); }
     @Override public void ShiftFirstRight() { ShiftRight(Natural.ONE); }
     @Override public void ShiftLastRight() { ShiftRight(Size().Decrement(), Natural.ONE); }
 
-
     /* ************************************************************************ */
-    /* Metodi di Gestione Memoria (Reallocable/Resizable)                       */
+    /* Metodi Resize                                                            */
     /* ************************************************************************ */
-
-    @Override
-    public void Clear() {
-        super.Clear(); // Chiama DynLinearVectorBase.Clear() che azzera size e VectorBase.Clear() che pulisce array
-    }
-
+    
     @Override
     public void Expand() {
-        // Raddoppia la capacità (GROW_FACTOR = 2.0)
         long newCap = (Capacity().IsZero()) ? 1 : (long)(Capacity().ToLong() * GROW_FACTOR);
         Expand(Natural.Of(newCap - Capacity().ToLong()));
     }
 
     @Override
-    public void Grow() {
-        Expand();
-    }
+    public void Grow() { Expand(); }
+    @Override
+    public void Grow(Natural n) { Expand(n); }
     
     @Override
-    public void Grow(Natural n) {
-        Expand(n);
-    }
-
-    @Override
     public void Shrink() {
-        // Riduci se size < capacity / (SHRINK_FACTOR * THRESHOLD)
-        // Logica semplificata: se size è 1/4 della capacity, dimezza.
         long cap = Capacity().ToLong();
         long sz = Size().ToLong();
         if (sz > 0 && cap >= (long)(sz * SHRINK_FACTOR * THRESHOLD_FACTOR)) {
              long newCap = (long)(cap / SHRINK_FACTOR);
-             if (newCap < sz) newCap = sz; // Safety
+             if (newCap < sz) newCap = sz;
              Realloc(Natural.Of(newCap));
         }
     }
-    
     @Override
-    public void Reduce() {
-        Shrink();
-    }
-
+    public void Reduce() { Shrink(); }
 
     /* ************************************************************************ */
     /* Metodi Accessori e Utility                                               */
     /* ************************************************************************ */
 
-    @Override
-    public boolean IsEmpty() {
-        return Size().IsZero();
-    }
-
-    @Override
-    public Data GetFirst() {
-        if (IsEmpty()) throw new IndexOutOfBoundsException("Empty vector");
-        return GetAt(Natural.ZERO);
-    }
-
-    @Override
-    public Data GetLast() {
-        if (IsEmpty()) throw new IndexOutOfBoundsException("Empty vector");
-        return GetAt(Size().Decrement());
-    }
-
-    @Override
-    public void InsertFirst(Data dat) {
-        InsertAt(dat, Natural.ZERO);
-    }
-
-    @Override
-    public void InsertLast(Data dat) {
-        InsertAt(dat, Size());
-    }
-
-    @Override
-    public void RemoveAt(Natural n) {
-        AtNRemove(n);
-    }
-
-    @Override
-    public void RemoveFirst() {
-        RemoveAt(Natural.ZERO);
-    }
-
-    @Override
-    public Data FirstNRemove() {
-        return AtNRemove(Natural.ZERO);
-    }
-
-    @Override
-    public void RemoveLast() {
-        RemoveAt(Size().Decrement());
-    }
-
-    @Override
-    public Data LastNRemove() {
-        return AtNRemove(Size().Decrement());
-    }
+    @Override public boolean IsEmpty() { return Size().IsZero(); }
+    @Override public Data GetFirst() { if (IsEmpty()) throw new IndexOutOfBoundsException(); return GetAt(Natural.ZERO); }
+    @Override public Data GetLast() { if (IsEmpty()) throw new IndexOutOfBoundsException(); return GetAt(Size().Decrement()); }
+    @Override public void InsertFirst(Data dat) { InsertAt(dat, Natural.ZERO); }
+    @Override public void InsertLast(Data dat) { InsertAt(dat, Size()); } // InsertAt gestisce Expand
+    @Override public void RemoveAt(Natural n) { AtNRemove(n); }
+    @Override public void RemoveFirst() { RemoveAt(Natural.ZERO); }
+    @Override public Data FirstNRemove() { return AtNRemove(Natural.ZERO); }
+    @Override public void RemoveLast() { RemoveAt(Size().Decrement()); }
+    @Override public Data LastNRemove() { return AtNRemove(Size().Decrement()); }
 
     @Override
     public Natural Search(Data dat) {
         long sz = Size().ToLong();
         for(long i=0; i<sz; i++) {
             Data curr = GetAt(Natural.Of(i));
-            if ((curr==null && dat==null) || (curr!=null && curr.equals(dat))) {
-                return Natural.Of(i);
-            }
+            if ((curr==null && dat==null) || (curr!=null && curr.equals(dat))) return Natural.Of(i);
         }
-        return null; // Non trovato
+        return null;
     }
-
-    @Override
-    public boolean IsInBound(Natural n) {
-        return n.compareTo(Size()) < 0;
-    }
-
-    @Override
-    public boolean Exists(Data dat) {
-        return Search(dat) != null;
-    }
-
+    @Override public boolean IsInBound(Natural n) { return n.compareTo(Size()) < 0; }
+    @Override public boolean Exists(Data dat) { return Search(dat) != null; }
     @Override
     public boolean TraverseForward(Predicate<Data> predicate) {
         long sz = Size().ToLong();
-        for(long i=0; i<sz; i++) {
-            if (predicate.Apply(GetAt(Natural.Of(i)))) return true;
-        }
+        for(long i=0; i<sz; i++) if (predicate.Apply(GetAt(Natural.Of(i)))) return true;
         return false;
     }
-
     @Override
     public boolean TraverseBackward(Predicate<Data> predicate) {
         long sz = Size().ToLong();
-        for(long i=sz-1; i>=0; i--) {
-            if (predicate.Apply(GetAt(Natural.Of(i)))) return true;
-        }
+        for(long i=sz-1; i>=0; i--) if (predicate.Apply(GetAt(Natural.Of(i)))) return true;
         return false;
     }
-
-    @Override
-    public boolean IsEqual(IterableContainer<Data> container) {
-        if (container == null) return false;
-        if (Size().compareTo(container.Size()) != 0) return false;
-        
+    @Override public boolean IsEqual(IterableContainer<Data> container) {
+        if (container == null || Size().compareTo(container.Size()) != 0) return false;
         final long[] idx = {0};
-        return !container.TraverseForward(new Predicate<Data>() {
-            @Override
-            public boolean Apply(Data other) {
-                Data mine = GetAt(Natural.Of(idx[0]++));
-                boolean eq = (mine == null) ? other == null : mine.equals(other);
-                return !eq;
-            }
+        return !container.TraverseForward(other -> {
+            Data mine = GetAt(Natural.Of(idx[0]++));
+            return !((mine == null) ? other == null : mine.equals(other));
         });
     }
-
+    @Override public Data GetNSetAt(Data dat, Natural n) { Data old = GetAt(n); SetAt(dat, n); return old; }
+    @Override public void SetFirst(Data dat) { if(IsEmpty()) throw new IndexOutOfBoundsException(); SetAt(dat, Natural.ZERO); }
+    @Override public Data GetNSetFirst(Data dat) { if(IsEmpty()) throw new IndexOutOfBoundsException(); return GetNSetAt(dat, Natural.ZERO); }
+    @Override public void SetLast(Data dat) { if(IsEmpty()) throw new IndexOutOfBoundsException(); SetAt(dat, Size().Decrement()); }
+    @Override public Data GetNSetLast(Data dat) { if(IsEmpty()) throw new IndexOutOfBoundsException(); return GetNSetAt(dat, Size().Decrement()); }
+    @Override public void Swap(Natural pos1, Natural pos2) { Data tmp = GetAt(pos1); SetAt(GetAt(pos2), pos1); SetAt(tmp, pos2); }
+    
     @Override
-    public Data GetNSetAt(Data dat, Natural n) {
-        Data old = GetAt(n);
-        SetAt(dat, n);
-        return old;
-    }
-
-    @Override
-    public void SetFirst(Data dat) {
-        if(IsEmpty()) throw new IndexOutOfBoundsException();
-        SetAt(dat, Natural.ZERO);
-    }
-
-    @Override
-    public Data GetNSetFirst(Data dat) {
-        if(IsEmpty()) throw new IndexOutOfBoundsException();
-        return GetNSetAt(dat, Natural.ZERO);
-    }
-
-    @Override
-    public void SetLast(Data dat) {
-        if(IsEmpty()) throw new IndexOutOfBoundsException();
-        SetAt(dat, Size().Decrement());
-    }
-
-    @Override
-    public Data GetNSetLast(Data dat) {
-        if(IsEmpty()) throw new IndexOutOfBoundsException();
-        return GetNSetAt(dat, Size().Decrement());
-    }
-
-    @Override
-    public void Swap(Natural pos1, Natural pos2) {
-        Data tmp = GetAt(pos1);
-        SetAt(GetAt(pos2), pos1);
-        SetAt(tmp, pos2);
-    }
-
-    @Override
-    public apsd.interfaces.containers.sequences.DynVector<Data> SubVector(Natural start, Natural end) {
+    public DynVector<Data> SubVector(Natural start, Natural end) {
         long len = end.ToLong() - start.ToLong();
-        if (len < 0) throw new IllegalArgumentException("Invalid range");
-        
+        if (len < 0) throw new IllegalArgumentException();
         DynVector<Data> sub = new DynVector<>(Natural.Of(len));
-        for(long i=0; i<len; i++) {
-            sub.InsertLast(GetAt(Natural.Of(start.ToLong() + i)));
-        }
+        for(long i=0; i<len; i++) sub.InsertLast(GetAt(Natural.Of(start.ToLong() + i)));
         return sub;
     }
 }
