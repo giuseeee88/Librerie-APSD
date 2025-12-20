@@ -6,233 +6,353 @@ import apsd.interfaces.containers.base.IterableContainer;
 import apsd.interfaces.containers.base.TraversableContainer;
 import apsd.interfaces.traits.Predicate;
 
+/**
+ * Object: Concrete dynamic circular vector implementation.
+ * Questa classe gestisce le operazioni di alto livello (Insert/Remove) delegando
+ * la logica posizionale e di memoria alla classe base ottimizzata.
+ */
 public class DynCircularVector<Data> extends DynCircularVectorBase<Data> {
 
-    public DynCircularVector() {
-        this(Natural.ZERO);
+  /* ************************************************************************ */
+  /* Costruttori                                                              */
+  /* ************************************************************************ */
+
+  public DynCircularVector() {
+    this(Natural.ZERO);
+  }
+
+  public DynCircularVector(Natural inisize) {
+    // Realloc in DynCircularVectorBase imposta capacity e linearizza start a 0
+    Realloc(inisize); 
+    // Inizialmente size è 0.
+    this.size = 0; 
+  }
+
+  public DynCircularVector(TraversableContainer<Data> con) {
+    // Pre-allochiamo la dimensione esatta per efficienza
+    Realloc(con.Size());
+    con.TraverseForward(new Predicate<Data>() {
+      @Override
+      public boolean Apply(Data dat) {
+        InsertLast(dat);
+        return false; // Continua l'attraversamento
+      }
+    });
+  }
+
+  protected DynCircularVector(Data[] arr) {
+    NewVector(arr);
+    this.size = (arr != null) ? arr.length : 0;
+    // CircularVectorBase assume start=0 di default
+  }
+
+  public static <Data> DynCircularVector<Data> Wrap(Data[] arr) {
+    return new DynCircularVector<>(arr);
+  }
+
+  /* ************************************************************************ */
+  /* Metodi di Modifica Strutturale (Core Logic)                              */
+  /* ************************************************************************ */
+
+  @Override
+  public void InsertAt(Data dat, Natural pos) {
+    if (pos.compareTo(Size()) > 0) throw new IndexOutOfBoundsException("Insert index out of bounds: " + pos);
+
+    // 1. Expand se necessario (se size ha raggiunto la capacity)
+    if (size >= Capacity().ToLong()) {
+      Expand();
     }
 
-    public DynCircularVector(Natural inisize) {
-        Realloc(inisize);
-        this.size = inisize.ToLong();
+    // 2. Crea lo spazio solo se non stiamo inserendo in coda (Append)
+    // ShiftRight della base gestisce l'ottimizzazione (sposta testa o coda)
+    if (pos.compareTo(Size()) < 0) {
+      ShiftRight(pos, Natural.ONE);
     }
 
-    public DynCircularVector(TraversableContainer<Data> con) {
-        this(con.Size());
-        con.TraverseForward(new Predicate<Data>() {
-            long idx = 0;
-            @Override
-            public boolean Apply(Data dat) {
-                // Scrittura diretta per inizializzazione
-                rawSet(dat, idx++);
-                return false;
-            }
-        });
+    // 3. Scrivi il dato nella posizione (ora libera o nuova)
+    SetAt(dat, pos);
+
+    // 4. Aggiorna la dimensione logica
+    size++;
+  }
+
+  @Override
+  public Data AtNRemove(Natural pos) {
+    if (pos.compareTo(Size()) >= 0) throw new IndexOutOfBoundsException("Remove index out of bounds: " + pos);
+
+    // 1. Recupera il dato da rimuovere
+    Data removed = GetAt(pos);
+
+    // 2. Chiudi il buco (ShiftLeft della base gestisce l'ottimizzazione)
+    ShiftLeft(pos, Natural.ONE);
+
+    // 3. Aggiorna la dimensione logica
+    size--;
+
+    // 4. Shrink opzionale (riduce la memoria se troppo vuota)
+    // Shrink(); 
+
+    return removed;
+  }
+
+  /* ************************************************************************ */
+  /* Metodi Accessori e Utility (Shortcuts)                                   */
+  /* ************************************************************************ */
+
+  @Override
+  public boolean IsEmpty() {
+    return size == 0;
+  }
+
+  @Override
+  public Data GetFirst() {
+    if (IsEmpty()) throw new IndexOutOfBoundsException("Vector is empty");
+    return GetAt(Natural.ZERO);
+  }
+
+  @Override
+  public Data GetLast() {
+    if (IsEmpty()) throw new IndexOutOfBoundsException("Vector is empty");
+    return GetAt(Size().Decrement());
+  }
+
+  @Override
+  public void InsertFirst(Data dat) {
+    InsertAt(dat, Natural.ZERO);
+  }
+
+  @Override
+  public void InsertLast(Data dat) {
+    InsertAt(dat, Size());
+  }
+
+  @Override
+  public void RemoveFirst() {
+    AtNRemove(Natural.ZERO);
+  }
+
+  @Override
+  public Data FirstNRemove() {
+    return AtNRemove(Natural.ZERO);
+  }
+
+  @Override
+  public void RemoveLast() {
+    AtNRemove(Size().Decrement());
+  }
+
+  @Override
+  public Data LastNRemove() {
+    return AtNRemove(Size().Decrement());
+  }
+
+  @Override
+  public void RemoveAt(Natural n) {
+    AtNRemove(n);
+  }
+
+  /* ************************************************************************ */
+  /* Metodi MutableSequence (GetNSet, Swap)                                   */
+  /* ************************************************************************ */
+
+  @Override
+  public Data GetNSetAt(Data dat, Natural n) {
+    Data old = GetAt(n);
+    SetAt(dat, n);
+    return old;
+  }
+
+  @Override
+  public void SetFirst(Data dat) {
+    if (IsEmpty()) throw new IndexOutOfBoundsException("Vector is empty");
+    SetAt(dat, Natural.ZERO);
+  }
+
+  @Override
+  public Data GetNSetFirst(Data dat) {
+    if (IsEmpty()) throw new IndexOutOfBoundsException("Vector is empty");
+    return GetNSetAt(dat, Natural.ZERO);
+  }
+
+  @Override
+  public void SetLast(Data dat) {
+    if (IsEmpty()) throw new IndexOutOfBoundsException("Vector is empty");
+    SetAt(dat, Size().Decrement());
+  }
+
+  @Override
+  public Data GetNSetLast(Data dat) {
+    if (IsEmpty()) throw new IndexOutOfBoundsException("Vector is empty");
+    return GetNSetAt(dat, Size().Decrement());
+  }
+
+  @Override
+  public void Swap(Natural pos1, Natural pos2) {
+    Data tmp = GetAt(pos1);
+    SetAt(GetAt(pos2), pos1);
+    SetAt(tmp, pos2);
+  }
+
+  /* ************************************************************************ */
+  /* Metodi Shift (Alias ai metodi Base)                                      */
+  /* ************************************************************************ */
+
+  @Override
+  public void ShiftLeft(Natural n) {
+    ShiftLeft(Natural.ZERO, n);
+  }
+
+  @Override
+  public void ShiftFirstLeft() {
+    ShiftLeft(Natural.ONE);
+  }
+
+  @Override
+  public void ShiftLastLeft() {
+    ShiftLeft(Size().Decrement(), Natural.ONE);
+  }
+
+  @Override
+  public void ShiftRight(Natural n) {
+    ShiftRight(Natural.ZERO, n);
+  }
+
+  @Override
+  public void ShiftFirstRight() {
+    ShiftRight(Natural.ONE);
+  }
+
+  @Override
+  public void ShiftLastRight() {
+    ShiftRight(Size().Decrement(), Natural.ONE);
+  }
+
+  /* ************************************************************************ */
+  /* Implementazione Container / Traversable / Search                         */
+  /* ************************************************************************ */
+
+  @Override
+  public Natural Search(Data dat) {
+    long sz = Size().ToLong();
+    for (long i = 0; i < sz; i++) {
+      Data val = GetAt(Natural.Of(i));
+      if ((dat == null && val == null) || (dat != null && dat.equals(val))) {
+        return Natural.Of(i);
+      }
     }
+    return null;
+  }
 
-    protected DynCircularVector(Data[] arr) {
-        NewVector(arr);
-        this.size = (arr != null) ? arr.length : 0;
+  @Override
+  public boolean Exists(Data dat) {
+    return Search(dat) != null;
+  }
+
+  @Override
+  public boolean IsInBound(Natural n) {
+    return n.compareTo(Size()) < 0;
+  }
+
+  @Override
+  public boolean TraverseForward(Predicate<Data> predicate) {
+    long sz = Size().ToLong();
+    for (long i = 0; i < sz; i++) {
+      if (predicate.Apply(GetAt(Natural.Of(i)))) return true;
     }
+    return false;
+  }
 
-    public static <Data> DynCircularVector<Data> Wrap(Data[] arr) {
-        return new DynCircularVector<>(arr);
+  @Override
+  public boolean TraverseBackward(Predicate<Data> predicate) {
+    long sz = Size().ToLong();
+    for (long i = sz - 1; i >= 0; i--) {
+      if (predicate.Apply(GetAt(Natural.Of(i)))) return true;
     }
+    return false;
+  }
 
-    // Helper: Accesso fisico diretto (ignora Size, rispetta Capacity)
-    private void rawSet(Data dat, long logicalIdx) {
-        long cap = Capacity().ToLong();
-        if (cap == 0) return;
-        long physicalIdx = (start + logicalIdx) % cap;
-        arr[(int) physicalIdx] = dat;
+  @Override
+  public boolean IsEqual(IterableContainer<Data> container) {
+    if (container == null) return false;
+    if (Size().compareTo(container.Size()) != 0) return false;
+
+    final long[] idx = {0};
+    return !container.TraverseForward(new Predicate<Data>() {
+      @Override
+      public boolean Apply(Data other) {
+        Data mine = GetAt(Natural.Of(idx[0]++));
+        boolean eq = (mine == null) ? other == null : mine.equals(other);
+        return !eq;
+      }
+    });
+  }
+
+  @Override
+  public apsd.interfaces.containers.sequences.DynVector<Data> SubVector(Natural start, Natural end) {
+    long len = end.ToLong() - start.ToLong();
+    if (len < 0) throw new IllegalArgumentException("Invalid range: end < start");
+
+    DynCircularVector<Data> sub = new DynCircularVector<>(Natural.Of(len));
+    for (long i = 0; i < len; i++) {
+      sub.InsertLast(GetAt(Natural.Of(start.ToLong() + i)));
     }
+    return sub;
+  }
 
-    private Data rawGet(long logicalIdx) {
-        long cap = Capacity().ToLong();
-        if (cap == 0) throw new IndexOutOfBoundsException("Capacity 0");
-        long physicalIdx = (start + logicalIdx) % cap;
-        return arr[(int) physicalIdx];
+  /* ************************************************************************ */
+  /* Metodi Resize (Expand/Grow/Shrink) - Implementati Completi               */
+  /* ************************************************************************ */
+
+  /**
+   * Espande il vettore secondo il GROW_FACTOR (default 2.0).
+   * Viene chiamato automaticamente quando InsertAt rileva che il vettore è pieno.
+   */
+  @Override
+  public void Expand() {
+    long cap = Capacity().ToLong();
+    // Se capacity è 0, inizializza a 1, altrimenti raddoppia.
+    long newCap = (cap == 0) ? 1 : (long)(cap * GROW_FACTOR);
+    Realloc(Natural.Of(newCap));
+  }
+
+  /**
+   * Espande il vettore per garantire spazio per 'n' elementi AGGIUNTIVI.
+   * Override per assicurarsi che 'size' sia considerato correttamente.
+   */
+  @Override
+  public void Expand(Natural n) {
+    long reqSize = size + n.ToLong();
+    if (reqSize > Capacity().ToLong()) {
+       // Se la dimensione richiesta supera la capacità, rialloca
+       Realloc(Natural.Of(reqSize));
     }
+  }
 
-    @Override
-    public void InsertAt(Data dat, Natural pos) {
-        long idx = pos.ToLong();
-        // idx == size è valido per append
-        if (idx < 0 || idx > size) throw new IndexOutOfBoundsException("Index: " + idx + ", Size: " + size);
+  @Override
+  public void Grow() {
+    Expand();
+  }
 
-        if (size >= Capacity().ToLong()) {
-            Grow();
-        }
+  @Override
+  public void Grow(Natural n) {
+    Expand(n);
+  }
 
-        // Shift a destra usando rawSet per poter scrivere in posizioni >= size
-        for (long i = size; i > idx; i--) {
-            rawSet(rawGet(i - 1), i);
-        }
-
-        rawSet(dat, idx);
-        size++;
+  @Override
+  public void Shrink() {
+    long cap = Capacity().ToLong();
+    long sz = size;
+    // Se la size è inferiore a Capacity / (SHRINK * THRESHOLD), riduciamo
+    // Esempio: size=10, cap=100. Riduce a cap=50 (o 25 a seconda del fattore).
+    if (sz > 0 && cap >= (long)(sz * SHRINK_FACTOR * THRESHOLD_FACTOR)) {
+      long newCap = (long)(cap / SHRINK_FACTOR);
+      if (newCap < sz) newCap = sz; // Safety: non scendere sotto la size attuale
+      Realloc(Natural.Of(newCap));
     }
+  }
 
-    @Override
-    public Data AtNRemove(Natural pos) {
-        long idx = pos.ToLong();
-        if (idx < 0 || idx >= size) throw new IndexOutOfBoundsException("Index: " + idx + ", Size: " + size);
-
-        Data removed = rawGet(idx);
-
-        // Shift a sinistra
-        for (long i = idx; i < size - 1; i++) {
-            rawSet(rawGet(i + 1), i);
-        }
-
-        size--;
-        rawSet(null, size); // Clean up
-        return removed;
-    }
-
-    @Override
-    public void Expand(Natural n) {
-        long newSize = size + n.ToLong();
-        if (newSize > Capacity().ToLong()) {
-            Realloc(Natural.Of(newSize));
-        }
-        size = newSize;
-    }
-
-    @Override
-    public void Grow() {
-        long cap = Capacity().ToLong();
-        long newCap = (cap == 0) ? 1 : (long)(cap * GROW_FACTOR);
-        Realloc(Natural.Of(newCap));
-    }
-
-    @Override
-    public void Grow(Natural n) {
-        long reqCap = Capacity().ToLong() + n.ToLong();
-        Realloc(Natural.Of(reqCap));
-    }
-
-    @Override
-    public void Shrink() {
-        long cap = Capacity().ToLong();
-        if (size > 0 && cap > size * THRESHOLD_FACTOR * SHRINK_FACTOR) {
-             long newCap = (long)(cap / SHRINK_FACTOR);
-             if (newCap < size) newCap = size;
-             Realloc(Natural.Of(newCap));
-        }
-    }
-
-    @Override
-    public void Reduce(Natural n) {
-        long dec = n.ToLong();
-        if (dec > size) throw new IllegalArgumentException("Reduce > size");
-        for (long i = size - dec; i < size; i++) {
-            rawSet(null, i);
-        }
-        size -= dec;
-    }
-
-    // Alias
-    @Override public void Expand() { Expand(Natural.ONE); }
-    @Override public void Reduce() { Reduce(Natural.ONE); }
-    
-    @Override public boolean IsEmpty() { return size == 0; }
-    
-    @Override public Data GetFirst() { 
-        if(size == 0) throw new IndexOutOfBoundsException("Vector is empty"); 
-        return GetAt(Natural.ZERO); 
-    }
-    @Override public Data GetLast() { 
-        if(size == 0) throw new IndexOutOfBoundsException("Vector is empty"); 
-        return GetAt(Natural.Of(size - 1)); 
-    }
-
-    @Override
-    public Natural Search(Data dat) {
-        for(long i=0; i<size; i++) {
-            Data val = rawGet(i);
-            if ((dat==null && val==null) || (dat!=null && dat.equals(val))) return Natural.Of(i);
-        }
-        return null;
-    }
-    
-    @Override public boolean Exists(Data dat) { return Search(dat) != null; }
-    @Override public boolean IsInBound(Natural n) { return n.ToLong() < size; }
-
-    @Override
-    public boolean IsEqual(IterableContainer<Data> container) {
-        if(container == null || Size().compareTo(container.Size())!=0) return false;
-        final long[] i = {0};
-        return !container.TraverseForward(dat -> {
-            Data my = rawGet(i[0]++);
-            return !((my==null)?dat==null : my.equals(dat));
-        });
-    }
-
-    @Override
-    public boolean TraverseForward(Predicate<Data> predicate) {
-        for(long i=0; i<size; i++) {
-            if(predicate.Apply(rawGet(i))) return true;
-        }
-        return false;
-    }
-
-    @Override
-    public boolean TraverseBackward(Predicate<Data> predicate) {
-        for(long i=size-1; i>=0; i--) {
-            if(predicate.Apply(rawGet(i))) return true;
-        }
-        return false;
-    }
-
-    @Override public Data GetNSetAt(Data dat, Natural n) { Data old = GetAt(n); SetAt(dat, n); return old; }
-    @Override public void SetFirst(Data dat) { if(size==0) throw new IndexOutOfBoundsException(); SetAt(dat, Natural.ZERO); }
-    @Override public Data GetNSetFirst(Data dat) { if(size==0) throw new IndexOutOfBoundsException(); return GetNSetAt(dat, Natural.ZERO); }
-    @Override public void SetLast(Data dat) { if(size==0) throw new IndexOutOfBoundsException(); SetAt(dat, Natural.Of(size-1)); }
-    @Override public Data GetNSetLast(Data dat) { if(size==0) throw new IndexOutOfBoundsException(); return GetNSetAt(dat, Natural.Of(size-1)); }
-    @Override public void Swap(Natural pos1, Natural pos2) { Data tmp = GetAt(pos1); SetAt(GetAt(pos2), pos1); SetAt(tmp, pos2); }
-
-    @Override public void Clear() {
-        super.Clear(); 
-        size = 0;
-        start = 0;
-    }
-
-    @Override public void InsertFirst(Data dat) { InsertAt(dat, Natural.ZERO); }
-    @Override public void InsertLast(Data dat) { InsertAt(dat, Natural.Of(size)); }
-    @Override public void RemoveFirst() { AtNRemove(Natural.ZERO); }
-    @Override public void RemoveLast() { AtNRemove(Natural.Of(size - 1)); }
-    @Override public Data FirstNRemove() { return AtNRemove(Natural.ZERO); }
-    @Override public Data LastNRemove() { return AtNRemove(Natural.Of(size - 1)); }
-    @Override public void RemoveAt(Natural n) { AtNRemove(n); }
-
-    @Override public void ShiftLeft(Natural start, Natural n) {
-        long s = start.ToLong(); long d = n.ToLong();
-        if(s+d >= size) return;
-        for(long i=s; i < size-d; i++) rawSet(rawGet(i+d), i);
-        for(long i=size-d; i < size; i++) rawSet(null, i);
-    }
-    
-    @Override public void ShiftRight(Natural start, Natural n) {
-        long s = start.ToLong(); long d = n.ToLong();
-        if(s+d >= size) return;
-        for(long i=size-1; i >= s+d; i--) rawSet(rawGet(i-d), i);
-        for(long i=s; i < s+d; i++) rawSet(null, i);
-    }
-    
-    @Override public void ShiftLeft(Natural n) { ShiftLeft(Natural.ZERO, n); }
-    @Override public void ShiftFirstLeft() { ShiftLeft(Natural.ONE); }
-    @Override public void ShiftLastLeft() { ShiftLeft(Natural.Of(size-1), Natural.ONE); }
-    @Override public void ShiftRight(Natural n) { ShiftRight(Natural.ZERO, n); }
-    @Override public void ShiftFirstRight() { ShiftRight(Natural.ONE); }
-    @Override public void ShiftLastRight() { ShiftRight(Natural.Of(size-1), Natural.ONE); }
-
-    @Override
-    public apsd.interfaces.containers.sequences.DynVector<Data> SubVector(Natural start, Natural end) {
-        long len = end.ToLong() - start.ToLong();
-        if (len < 0) throw new IllegalArgumentException("Invalid range");
-        DynCircularVector<Data> sub = new DynCircularVector<>(Natural.Of(len));
-        for(long i=0; i<len; i++) sub.rawSet(rawGet(start.ToLong()+i), i);
-        return sub;
-    }
+  @Override
+  public void Reduce() {
+    Shrink();
+  }
 }

@@ -9,7 +9,6 @@ import apsd.interfaces.containers.base.TraversableContainer;
 import apsd.interfaces.containers.collections.Chain;
 import apsd.interfaces.containers.iterators.BackwardIterator;
 import apsd.interfaces.containers.iterators.ForwardIterator;
-import apsd.interfaces.containers.iterators.MutableBackwardIterator;
 import apsd.interfaces.containers.iterators.MutableForwardIterator;
 import apsd.interfaces.containers.sequences.Sequence;
 import apsd.interfaces.traits.Predicate;
@@ -22,22 +21,24 @@ abstract public class LLChainBase<Data> implements Chain<Data> {
   protected final Box<LLNode<Data>> tailref = new Box<>();
 
   public LLChainBase(TraversableContainer<Data> con) {
-    size.Assign(con.Size());
-    final Box<Boolean> first = new Box<>(true);
-    con.TraverseForward(dat -> {
-      LLNode<Data> node = new LLNode<>(dat);
-      if (first.Get()) {
-        headref.Set(node);
-        first.Set(false);
-      } else {
-        tailref.Get().SetNext(node);
-      }
-      tailref.Set(node);
-      return false;
-    });
+    if (con != null) {
+        size.Assign(con.Size());
+        final Box<Boolean> first = new Box<>(true);
+        con.TraverseForward(dat -> {
+          LLNode<Data> node = new LLNode<>(dat);
+          if (first.Get()) {
+            headref.Set(node);
+            first.Set(false);
+          } else {
+            tailref.Get().SetNext(node);
+          }
+          tailref.Set(node);
+          return false;
+        });
+    }
   }
 
-  // Metodo Factory Astratto (implementato da LLList e LLSortedChain)
+  // Metodo Factory Astratto
   abstract public LLChainBase<Data> NewChain(long capacity, LLNode<Data> head, LLNode<Data> tail);
 
   /* ************************************************************************ */
@@ -46,7 +47,6 @@ abstract public class LLChainBase<Data> implements Chain<Data> {
 
   protected MutableForwardIterator<Box<LLNode<Data>>> FRefIterator() {
     return new MutableForwardIterator<Box<LLNode<Data>>>() {
-      // Current box pointing to the node we are visiting
       Box<LLNode<Data>> current = headref;
 
       @Override
@@ -62,7 +62,6 @@ abstract public class LLChainBase<Data> implements Chain<Data> {
 
       @Override
       public void SetCurrent(Box<LLNode<Data>> dat) {
-        // Not supported/needed for RefIterator logic usually
         throw new UnsupportedOperationException();
       }
 
@@ -108,10 +107,6 @@ abstract public class LLChainBase<Data> implements Chain<Data> {
     return size.IsZero();
   }
 
-  /* ************************************************************************ */
-  /* Override specific member functions from ClearableContainer               */
-  /* ************************************************************************ */
-
   @Override
   public void Clear() {
     headref.Set(null);
@@ -126,29 +121,57 @@ abstract public class LLChainBase<Data> implements Chain<Data> {
   @Override
   public boolean Remove(Data dat) {
     if (dat == null || IsEmpty()) return false;
-    
-    // Box ausiliario per tracciare il predecessore (necessario per aggiornare tailref)
     final Box<LLNode<Data>> prevNodeBox = new Box<>(null); 
     
+    // Usiamo ForEachForward del RefIterator per trovare e rimuovere
     return FRefIterator().ForEachForward(curBox -> {
       LLNode<Data> node = curBox.Get();
       
       if (node.Get().equals(dat)) {
-        // Unlink: curBox (che è headref o un next) ora punta al successivo del nodo corrente
+        // Unlink
         curBox.Set(node.GetNext().Get());
         
-        // Fix Tail: Se abbiamo rimosso la coda, la nuova coda è il nodo precedente
+        // Fix Tail
         if (tailref.Get() == node) {
-          tailref.Set(prevNodeBox.Get()); // Se prev è null, la lista diventa vuota (corretto)
+          tailref.Set(prevNodeBox.Get());
         }
         
         size.Decrement();
-        return true; // Stop dopo la prima rimozione
+        return true; // Stop
       }
       
-      prevNodeBox.Set(node); // Avanzamento del predecessore
+      prevNodeBox.Set(node);
       return false;
     });
+  }
+
+  @Override
+  public boolean RemoveAll(TraversableContainer<Data> container) {
+      if (container == null) return false;
+      // Nota: TraversableContainer non supporta il return value per indicare modifica aggregata,
+      // ma noi dobbiamo ritornare true se almeno uno è stato rimosso.
+      final boolean[] modified = {false};
+      container.TraverseForward(dat -> {
+          if (Remove(dat)) modified[0] = true;
+          return false;
+      });
+      return modified[0];
+  }
+
+  @Override
+  public boolean RemoveSome(TraversableContainer<Data> container) {
+      // Logic is practically the same as RemoveAll for standard containers
+      return RemoveAll(container);
+  }
+
+  @Override
+  public void RemoveOccurrences(Data dat) {
+      // Simile a Filter, rimuove TUTTE le occorrenze uguali a dat
+      Filter(d -> d != null && d.equals(dat)); // Filter rimuove se predicato è FALSE?
+      // No, Filter in Collection solitamente MANTIENE se True, RIMUOVE se False.
+      // Quindi qui vogliamo RIMUOVERE se equals(dat).
+      // Ergo: Mantieni (true) se !equals(dat).
+      Filter(d -> (d == null) ? dat != null : !d.equals(dat));
   }
 
   /* ************************************************************************ */
@@ -160,26 +183,17 @@ abstract public class LLChainBase<Data> implements Chain<Data> {
     return new ForwardIterator<Data>() {
       MutableForwardIterator<Box<LLNode<Data>>> refIter = FRefIterator();
 
-      @Override
-      public boolean IsValid() { return refIter.IsValid(); }
-      @Override
-      public Data GetCurrent() { return refIter.GetCurrent().Get().Get(); }
-      @Override
-      public void Next() { refIter.Next(); }
-      @Override
-      public void Next(Natural n) { refIter.Next(n); }
-      @Override
-      public Data DataNNext() { return refIter.DataNNext().Get().Get(); }
-      @Override
-      public void Reset() { refIter.Reset(); }
-      // Default ForEachForward is used
+      @Override public boolean IsValid() { return refIter.IsValid(); }
+      @Override public Data GetCurrent() { return refIter.GetCurrent().Get().Get(); }
+      @Override public void Next() { refIter.Next(); }
+      @Override public void Next(Natural n) { refIter.Next(n); }
+      @Override public Data DataNNext() { return refIter.DataNNext().Get().Get(); }
+      @Override public void Reset() { refIter.Reset(); }
     };
   }
 
   @Override
   public BackwardIterator<Data> BIterator() {
-    // Lista concatenata singola: iterazione all'indietro inefficiente.
-    // Copiamo in un vettore temporaneo per iterare all'indietro.
     Vector<Data> tempVec = new Vector<>(this);
     return tempVec.BIterator();
   }
@@ -190,7 +204,7 @@ abstract public class LLChainBase<Data> implements Chain<Data> {
       final ForwardIterator<Data> iter = FIterator();
       return !container.TraverseForward(dat -> {
           Data myDat = iter.DataNNext();
-          return !myDat.equals(dat);
+          return !((myDat == null) ? dat == null : myDat.equals(dat));
       });
   }
   
@@ -243,7 +257,6 @@ abstract public class LLChainBase<Data> implements Chain<Data> {
     if (start.compareTo(end) > 0 || end.compareTo(Size()) > 0) throw new IndexOutOfBoundsException();
     long len = end.ToLong() - start.ToLong();
     
-    // Creiamo i nodi per la nuova catena
     LLNode<Data> newHead = null;
     LLNode<Data> newTail = null;
     
@@ -261,9 +274,22 @@ abstract public class LLChainBase<Data> implements Chain<Data> {
             newTail = newNode;
         }
     }
-    
-    // Usiamo il Factory Method astratto
+    // SubSequence ritorna Sequence, ma NewChain ritorna LLChainBase che implementa Sequence
     return NewChain(len, newHead, newTail);
+  }
+
+  @Override
+  public Natural Search(Data dat) {
+      long idx = 0;
+      MutableForwardIterator<Box<LLNode<Data>>> it = FRefIterator();
+      while(it.IsValid()) {
+          Data val = it.DataNNext().Get().Get();
+          if ((dat == null && val == null) || (dat != null && dat.equals(val))) {
+              return Natural.Of(idx);
+          }
+          idx++;
+      }
+      return null;
   }
 
   /* ************************************************************************ */
@@ -279,7 +305,6 @@ abstract public class LLChainBase<Data> implements Chain<Data> {
   public Data AtNRemove(Natural n) {
     if (n.compareTo(Size()) >= 0) throw new IndexOutOfBoundsException();
 
-    // Navighiamo fino al box che punta al nodo target
     Box<LLNode<Data>> curBox = headref;
     LLNode<Data> prevNode = null;
 
@@ -292,10 +317,8 @@ abstract public class LLChainBase<Data> implements Chain<Data> {
     LLNode<Data> nodeToRemove = curBox.Get();
     Data dat = nodeToRemove.Get();
 
-    // Unlink
     curBox.Set(nodeToRemove.GetNext().Get());
 
-    // Fix Tail
     if (tailref.Get() == nodeToRemove) {
       tailref.Set(prevNode);
     }
@@ -305,27 +328,16 @@ abstract public class LLChainBase<Data> implements Chain<Data> {
   }
 
   @Override
-  public void RemoveFirst() {
-    AtNRemove(Natural.ZERO);
-  }
-
+  public void RemoveFirst() { AtNRemove(Natural.ZERO); }
   @Override
-  public Data FirstNRemove() {
-    return AtNRemove(Natural.ZERO);
-  }
-
+  public Data FirstNRemove() { return AtNRemove(Natural.ZERO); }
   @Override
-  public void RemoveLast() {
-    AtNRemove(Size().Decrement());
-  }
-
+  public void RemoveLast() { AtNRemove(Size().Decrement()); }
   @Override
-  public Data LastNRemove() {
-    return AtNRemove(Size().Decrement());
-  }
+  public Data LastNRemove() { return AtNRemove(Size().Decrement()); }
 
   /* ************************************************************************ */
-  /* Override specific member functions from Collection                       */
+  /* Override specific member functions from Collection / Chain               */
   /* ************************************************************************ */
 
   @Override
@@ -336,20 +348,15 @@ abstract public class LLChainBase<Data> implements Chain<Data> {
 
       while (curBox != null && !curBox.IsNull()) {
           LLNode<Data> node = curBox.Get();
-          // Filter solitamente MANTIENE se true, RIMUOVE se false.
-          // Se predicate.Apply(data) è false -> Rimuovi.
-          
+          // Se predicato è false -> rimuovi
           if (!predicate.Apply(node.Get())) {
-              // Remove
               curBox.Set(node.GetNext().Get());
               if (tailref.Get() == node) {
                   tailref.Set(prevNode);
               }
               size.Decrement();
               modified = true;
-              // Non avanziamo curBox/prevNode, perché curBox ora punta già al prossimo
           } else {
-              // Advance
               prevNode = node;
               curBox = node.GetNext();
           }
@@ -359,65 +366,37 @@ abstract public class LLChainBase<Data> implements Chain<Data> {
 
   @Override
   public boolean Exists(Data dat) {
-      MutableForwardIterator<Box<LLNode<Data>>> it = FRefIterator();
-      while(it.IsValid()) {
-          Data d = it.DataNNext().Get().Get();
-          if ((d == null && dat == null) || (d != null && d.equals(dat))) return true;
+      return Search(dat) != null;
+  }
+
+  @Override
+  public boolean InsertAll(TraversableContainer<Data> container) {
+      if (container == null) return false;
+      final boolean[] modified = {false};
+      container.TraverseForward(dat -> {
+          if (Insert(dat)) modified[0] = true;
+          return false;
+      });
+      return modified[0];
+  }
+
+  @Override
+  public boolean InsertSome(TraversableContainer<Data> container) {
+      return InsertAll(container);
+  }
+
+  @Override
+  public boolean InsertIfAbsent(Data dat) {
+      if (!Exists(dat)) {
+          return Insert(dat);
       }
       return false;
   }
 
-@Override
-public boolean Insert(Data dat) {
-	// TODO Auto-generated method stub
-	return false;
-}
-
-@Override
-public boolean InsertAll(TraversableContainer<Data> container) {
-	// TODO Auto-generated method stub
-	return false;
-}
-
-@Override
-public boolean InsertSome(TraversableContainer<Data> container) {
-	// TODO Auto-generated method stub
-	return false;
-}
-
-@Override
-public boolean RemoveAll(TraversableContainer<Data> container) {
-	// TODO Auto-generated method stub
-	return false;
-}
-
-@Override
-public boolean RemoveSome(TraversableContainer<Data> container) {
-	// TODO Auto-generated method stub
-	return false;
-}
-
-@Override
-public boolean InsertIfAbsent(Data dat) {
-	// TODO Auto-generated method stub
-	return false;
-}
-
-@Override
-public void RemoveOccurrences(Data dat) {
-	// TODO Auto-generated method stub
-	
-}
-
-@Override
-public Chain<Data> SubChain(Natural start, Natural end) {
-	// TODO Auto-generated method stub
-	return null;
-}
-
-@Override
-public Natural Search(Data dat) {
-	// TODO Auto-generated method stub
-	return null;
-}
+  @Override
+  public Chain<Data> SubChain(Natural start, Natural end) {
+      // Usa la logica di SubSequence ma rispetta il tipo di ritorno Chain
+      // (SubSequence usa NewChain che ritorna un'istanza corretta)
+      return (Chain<Data>) SubSequence(start, end);
+  }
 }
