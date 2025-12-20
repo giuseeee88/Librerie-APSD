@@ -1,6 +1,5 @@
 package apsd.classes.containers.collections.abstractcollections.bases;
 
-import apsd.interfaces.containers.collections.Chain;
 import apsd.interfaces.containers.collections.OrderedSet;
 import apsd.interfaces.containers.collections.SortedChain;
 

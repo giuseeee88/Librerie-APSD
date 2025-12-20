@@ -103,8 +103,21 @@ public class CircularVector<Data> extends CircularVectorBase<Data> implements Ve
     @Override public void ShiftLeft(Natural n) { ShiftLeft(Natural.ZERO, n); }
     @Override public void ShiftRight(Natural n) { ShiftRight(Natural.ZERO, n); }
     
-    @Override public void ShiftLeft(Natural start, Natural n) { super.ShiftLeft(start, n); }
-    @Override public void ShiftRight(Natural start, Natural n) { super.ShiftRight(start, n); }
+    @Override 
+    public void ShiftLeft(Natural start, Natural n) { 
+        super.ShiftLeft(start, n);
+    }
+
+    @Override
+    public void ShiftRight(Natural start, Natural n) {
+        super.ShiftRight(start, n);
+        // Pulizia: mettiamo a null le posizioni liberate dallo shift
+        long idx = start.ToLong();
+        long num = n.ToLong();
+        for (long i = 0; i < num; i++) {
+            SetAt(null, Natural.Of(idx + i));
+        }
+    }
 
     @Override
     public Natural Search(Data dat) {

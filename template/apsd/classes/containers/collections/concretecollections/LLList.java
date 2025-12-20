@@ -271,7 +271,6 @@ public class LLList<Data> extends LLChainBase<Data> implements List<Data> {
         Filter(element -> (dat == null) ? (element != null) : !dat.equals(element));
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public List<Data> SubList(Natural start, Natural end) {
         // Ritorna una vista/copia come List

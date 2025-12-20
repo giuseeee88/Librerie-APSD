@@ -183,18 +183,6 @@ public abstract class WSetBase<Data, Chn extends Chain<Data>> implements Set<Dat
 
     @Override
     public boolean IsEqual(IterableContainer<Data> set) {
-        // 1. Controllo preliminare sulla dimensione (Ottimizzazione)
-        if (set instanceof Set) {
-            // Se le dimensioni sono diverse, i Set non possono essere uguali.
-            // (Nota: assumiamo che Natural supporti il confronto, altrimenti questo blocco si può saltare)
-            Natural mySize = this.Size();
-            Natural otherSize = ((Set<Data>) set).Size();
-            // Esempio fittizio di confronto, dipende dall'implementazione di Natural
-            // if (mySize.Compare(otherSize) != 0) return false; 
-        }
-
-        // 2. Controllo B ⊆ A: Tutti gli elementi di 'set' devono esistere in 'this'
-        // (Questa è la parte che dava errore con Next())
         ForwardIterator<Data> it = set.FIterator();
         while (it.IsValid()) { // Usa IsValid per verificare se ci sono elementi
             Data dataToCheck = it.DataNNext(); // Ottiene il dato e avanza
@@ -203,9 +191,6 @@ public abstract class WSetBase<Data, Chn extends Chain<Data>> implements Set<Dat
                 return false; // Trovato un elemento esterno che non possiedo -> Diversi
             }
         }
-
-        // 3. Controllo A ⊆ B: Tutti gli elementi di 'this' devono esistere in 'set'
-        // Usiamo TraverseForward per cercare un "contro-esempio" (un elemento mio che manca nell'altro).
         
         boolean foundMissing = this.TraverseForward(data -> {
             boolean existsInOther = false;
