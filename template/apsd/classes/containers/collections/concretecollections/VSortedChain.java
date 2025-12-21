@@ -7,16 +7,31 @@ import apsd.interfaces.containers.base.IterableContainer;
 import apsd.interfaces.containers.base.TraversableContainer;
 import apsd.interfaces.containers.collections.Set;
 import apsd.interfaces.containers.collections.SortedChain;
-import apsd.interfaces.containers.sequences.DynVector;
+import apsd.interfaces.containers.sequences.DynVector; // <--- CORRETTO (Interfaccia)
+import java.util.NoSuchElementException;
 
 public class VSortedChain<Data extends Comparable<? super Data>> extends VChainBase<Data> implements SortedChain<Data> {
 
-    public VSortedChain() { NewChain(new DynCircularVector<>()); }
-    public VSortedChain(TraversableContainer<Data> con) {
-        NewChain(new DynCircularVector<>());
-        if (con != null) con.TraverseForward(dat -> { Insert(dat); return false; });
+    public VSortedChain() {
+        super();
+        NewChain(new DynCircularVector<Data>());
     }
-    protected VSortedChain(DynVector<Data> vec) { NewChain(vec); }
+
+    public VSortedChain(TraversableContainer<Data> con) {
+        super();
+        NewChain(new DynCircularVector<Data>());
+        if (con != null) {
+            con.TraverseForward(dat -> {
+                Insert(dat);
+                return false;
+            });
+        }
+    }
+
+    protected VSortedChain(DynVector<Data> vec) {
+        super();
+        NewChain(vec);
+    }
 
     private long binarySearch(Data key) {
         if (key == null) return -1;
@@ -24,7 +39,7 @@ public class VSortedChain<Data extends Comparable<? super Data>> extends VChainB
         long high = Size().ToLong() - 1;
         while (low <= high) {
             long mid = (low + high) >>> 1;
-            Data midVal = vec.GetAt(Natural.Of(mid));
+            Data midVal = vec.GetAt(new Natural((int)mid));
             if (midVal == null) { low = mid + 1; continue; }
             int cmp = midVal.compareTo(key);
             if (cmp < 0) low = mid + 1;
@@ -34,65 +49,48 @@ public class VSortedChain<Data extends Comparable<? super Data>> extends VChainB
         return -(low + 1);
     }
 
-    @Override public boolean Insert(Data dat) {
-        if (dat == null) return false;
-        long res = binarySearch(dat);
-        // SortedChain permette duplicati? Solitamente sì, ma per i test dei Set
-        // il controllo Exists viene fatto dal wrapper.
-        // Qui inseriamo sempre.
-        long insertIndex = (res >= 0) ? res : -(res + 1);
-        vec.InsertAt(dat, Natural.Of(insertIndex));
-        return true;
-    }
-
-    @Override public boolean Exists(Data dat) { return dat != null && Search(dat) != null; }
-
-    @Override
-    public Natural Search(Data dat) {
-        if (dat == null) return null;
-        long res = binarySearch(dat);
-        return (res >= 0) ? Natural.Of(res) : null;
-    }
-
-    // FIX: Min e Max ritornano null se vuoti
     @Override public Data Min() { if (IsEmpty()) return null; return vec.GetFirst(); }
     @Override public Data Max() { if (IsEmpty()) return null; return vec.GetLast(); }
-
     @Override public void RemoveMin() { if (!IsEmpty()) vec.RemoveFirst(); }
     @Override public void RemoveMax() { if (!IsEmpty()) vec.RemoveLast(); }
-    @Override public Data MinNRemove() { return (!IsEmpty()) ? vec.FirstNRemove() : null; }
-    @Override public Data MaxNRemove() { return (!IsEmpty()) ? vec.LastNRemove() : null; }
-
+    @Override public Data MinNRemove() { if (IsEmpty()) return null; return vec.FirstNRemove(); }
+    @Override public Data MaxNRemove() { if (IsEmpty()) return null; return vec.LastNRemove(); }
     @Override public Data Predecessor(Data dat) { Natural idx = SearchPredecessor(dat); return (idx != null) ? vec.GetAt(idx) : null; }
     @Override public Data Successor(Data dat) { Natural idx = SearchSuccessor(dat); return (idx != null) ? vec.GetAt(idx) : null; }
-
     @Override public Natural SearchPredecessor(Data dat) {
         if (dat == null) return null;
         long res = binarySearch(dat);
         long idx = (res >= 0) ? res - 1 : (-(res + 1)) - 1;
-        if (idx >= 0 && idx < Size().ToLong()) return Natural.Of(idx);
+        if (idx >= 0 && idx < Size().ToLong()) return new Natural((int)idx);
         return null;
     }
-
     @Override public Natural SearchSuccessor(Data dat) {
         if (dat == null) return null;
         long res = binarySearch(dat);
         long idx = (res >= 0) ? res + 1 : -(res + 1);
-        if (idx >= 0 && idx < Size().ToLong()) return Natural.Of(idx);
+        if (idx >= 0 && idx < Size().ToLong()) return new Natural((int)idx);
         return null;
     }
-
     @Override public void RemovePredecessor(Data dat) { Natural idx = SearchPredecessor(dat); if (idx != null) vec.RemoveAt(idx); }
     @Override public void RemoveSuccessor(Data dat) { Natural idx = SearchSuccessor(dat); if (idx != null) vec.RemoveAt(idx); }
     @Override public Data PredecessorNRemove(Data dat) { Natural idx = SearchPredecessor(dat); return (idx != null) ? vec.AtNRemove(idx) : null; }
     @Override public Data SuccessorNRemove(Data dat) { Natural idx = SearchSuccessor(dat); return (idx != null) ? vec.AtNRemove(idx) : null; }
-    @Override public boolean Remove(Data dat) { if(dat==null) return false; long res = binarySearch(dat); if (res >= 0) { vec.RemoveAt(Natural.Of(res)); return true; } return false; }
-    @Override public void Union(Set<Data> set) { set.TraverseForward(dat -> { Insert(dat); return false; }); }
-    @Override public void Difference(Set<Data> set) { set.TraverseForward(dat -> { Remove(dat); return false; }); }
-    @Override public void Intersection(Set<Data> set) { Filter(dat -> !set.Exists(dat)); }
+    @Override public boolean Exists(Data dat) { return Search(dat) != null; }
+    @Override public Natural Search(Data dat) { if (dat == null) return null; long res = binarySearch(dat); return (res >= 0) ? new Natural((int)res) : null; }
+    @Override public boolean Insert(Data dat) {
+        if (dat == null) return false;
+        long res = binarySearch(dat);
+        long insertIndex = (res >= 0) ? res : -(res + 1);
+        vec.InsertAt(dat, new Natural((int)insertIndex));
+        return true;
+    }
+    @Override public boolean Remove(Data dat) { if (dat == null) return false; long res = binarySearch(dat); if (res >= 0) { vec.RemoveAt(new Natural((int)res)); return true; } return false; }
+    @Override public void Union(Set<Data> set) { if(set != null) set.TraverseForward(dat -> { Insert(dat); return false; }); }
+    @Override public void Difference(Set<Data> set) { if(set != null) set.TraverseForward(dat -> { Remove(dat); return false; }); }
+    @Override public void Intersection(Set<Data> set) { if(set != null) Filter(dat -> !set.Exists(dat)); }
     @Override public boolean IsEqual(IterableContainer<Data> container) { return super.IsEqual(container); }
     @Override public void Clear() { vec.Clear(); }
-    @Override public boolean InsertIfAbsent(Data dat) { if(dat==null) return false; long res = binarySearch(dat); if (res < 0) { vec.InsertAt(dat, Natural.Of(-(res + 1))); return true; } return false; }
-    @Override public void RemoveOccurrences(Data dat) { if(dat==null) return; long res = binarySearch(dat); if (res >= 0) Filter(elem -> elem.compareTo(dat) != 0); }
+    @Override public boolean InsertIfAbsent(Data dat) { if(dat == null) return false; long res = binarySearch(dat); if (res < 0) { vec.InsertAt(dat, new Natural((int)(-(res + 1)))); return true; } return false; }
+    @Override public void RemoveOccurrences(Data dat) { if(dat == null) return; long res = binarySearch(dat); if (res >= 0) Filter(elem -> elem.compareTo(dat) != 0); }
     @Override public SortedChain<Data> SubChain(Natural start, Natural end) { return new VSortedChain<>(vec.SubVector(start, end)); }
 }
