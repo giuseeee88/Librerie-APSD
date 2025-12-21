@@ -11,10 +11,6 @@ import apsd.interfaces.containers.iterators.ForwardIterator;
 /** Object: Wrapper Ordered Set implementation via Sorted Chain (VSortedChain). */
 public class WOrderedSet<Data extends Comparable<? super Data>> extends WOrderedSetBase<Data, VSortedChain<Data>> {
 
-    /* ************************************************************************ */
-    /* Costruttori                                                              */
-    /* ************************************************************************ */
-
     public WOrderedSet() {
         super();
     }
@@ -44,18 +40,10 @@ public class WOrderedSet<Data extends Comparable<? super Data>> extends WOrdered
         }
     }
 
-    /* ************************************************************************ */
-    /* Implementazione ChainAlloc                                               */
-    /* ************************************************************************ */
-
     @Override
     protected VSortedChain<Data> ChainAlloc() {
         return new VSortedChain<Data>();
     }
-
-    /* ************************************************************************ */
-    /* Metodi Set / OrderedSet                                                  */
-    /* ************************************************************************ */
 
     @Override
     public boolean Insert(Data dat) {
