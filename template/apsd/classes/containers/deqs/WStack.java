@@ -10,15 +10,26 @@ public class WStack<Data> implements Stack<Data> {
 
     protected final List<Data> lst;
 
-    public WStack() { this.lst = new VList<Data>(); }
-    public WStack(List<Data> lst) { this.lst = lst; }
+    public WStack() {
+        this.lst = new VList<Data>();
+    }
+
+    public WStack(List<Data> lst) {
+        this.lst = lst;
+    }
+
     public WStack(TraversableContainer<Data> con) {
         this.lst = new VList<Data>();
-        if (con != null) this.InsertAll(con);
+        if (con != null) {
+            this.InsertAll(con);
+        }
     }
+
     public WStack(List<Data> lst, TraversableContainer<Data> con) {
         this.lst = lst;
-        if (con != null) this.InsertAll(con);
+        if (con != null) {
+            this.InsertAll(con);
+        }
     }
 
     @Override
@@ -28,14 +39,16 @@ public class WStack<Data> implements Stack<Data> {
 
     @Override
     public Data Top() {
-        // Fix: Return null se vuoto per evitare eccezioni nei test "safe"
-        if (IsEmpty()) return null;
+        // Fix: Return null if empty to avoid exceptions in "safe" tests
+        if (IsEmpty()) {
+            return null;
+        }
         return lst.GetFirst();
     }
 
     @Override
     public void Pop() {
-        // Fix: No-op se vuoto
+        // Fix: No-op if empty
         if (!IsEmpty()) {
             lst.RemoveFirst();
         }
@@ -67,10 +80,36 @@ public class WStack<Data> implements Stack<Data> {
         return d;
     }
 
-    @Override public void Clear() { if (lst != null) lst.Clear(); }
-    @Override public Natural Size() { return lst.Size(); }
-    @Override public boolean IsEmpty() { return lst.IsEmpty(); }
-    @Override public boolean Insert(Data dat) { Push(dat); return true; }
-    @Override public boolean InsertAll(TraversableContainer<Data> container) { return lst.InsertAll(container); }
-    @Override public boolean InsertSome(TraversableContainer<Data> container) { return lst.InsertSome(container); }
+    @Override
+    public void Clear() {
+        if (lst != null) {
+            lst.Clear();
+        }
+    }
+
+    @Override
+    public Natural Size() {
+        return lst.Size();
+    }
+
+    @Override
+    public boolean IsEmpty() {
+        return lst.IsEmpty();
+    }
+
+    @Override
+    public boolean Insert(Data dat) {
+        Push(dat);
+        return true;
+    }
+
+    @Override
+    public boolean InsertAll(TraversableContainer<Data> container) {
+        return lst.InsertAll(container);
+    }
+
+    @Override
+    public boolean InsertSome(TraversableContainer<Data> container) {
+        return lst.InsertSome(container);
+    }
 }
