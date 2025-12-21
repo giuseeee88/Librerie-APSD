@@ -12,23 +12,13 @@ import apsd.interfaces.traits.Predicate;
 /** Object: Abstract wrapper set base implementation via chain. */
 public abstract class WSetBase<Data, Chn extends Chain<Data>> implements Set<Data> {
 
-    // La struttura dati interna (Chain) che viene "wrappata"
     protected Chn chn;
 
-    // Metodo astratto per allocare la catena specifica (es. LinearList, DoublyLinkedList)
     protected abstract Chn ChainAlloc();
 
-    /**
-     * Costruttore di default.
-     * Inizializza la catena interna usando il metodo factory ChainAlloc.
-     */
     public WSetBase() {
         this.chn = ChainAlloc();
     }
-
-    /* ************************************************************************ */
-    /* Override specific member functions from Container                        */
-    /* ************************************************************************ */
 
     @Override
     public void Clear() {
@@ -40,13 +30,8 @@ public abstract class WSetBase<Data, Chn extends Chain<Data>> implements Set<Dat
         return chn.IsEmpty();
     }
 
-    /* ************************************************************************ */
-    /* Override specific member functions from InsertableContainer              */
-    /* ************************************************************************ */
-
     @Override
     public boolean Insert(Data dat) {
-        // Logica Set: Inserisci solo se NON esiste già
         if (!chn.Exists(dat)) {
             return chn.Insert(dat);
         }
@@ -55,15 +40,13 @@ public abstract class WSetBase<Data, Chn extends Chain<Data>> implements Set<Dat
 
     @Override
     public boolean InsertAll(TraversableContainer<Data> container) {
-        // Utilizziamo un array di boolean per tracciare se almeno un inserimento ha avuto successo
-        // (necessario perché le lambda non possono modificare variabili locali primitive)
         boolean[] changed = {false};
         
         container.TraverseForward(data -> {
             if (this.Insert(data)) {
                 changed[0] = true;
             }
-            return true; // Continua l'attraversamento
+            return true;
         });
         
         return changed[0];
@@ -71,12 +54,8 @@ public abstract class WSetBase<Data, Chn extends Chain<Data>> implements Set<Dat
 
     @Override
     public boolean InsertSome(TraversableContainer<Data> container) {
-        return InsertAll(container); // Semantica identica per i Set in questo contesto
+        return InsertAll(container);
     }
-
-    /* ************************************************************************ */
-    /* Override specific member functions from RemovableContainer               */
-    /* ************************************************************************ */
 
     @Override
     public boolean Remove(Data dat) {
@@ -102,10 +81,6 @@ public abstract class WSetBase<Data, Chn extends Chain<Data>> implements Set<Dat
         return RemoveAll(container);
     }
 
-    /* ************************************************************************ */
-    /* Override specific member functions from IterableContainer                */
-    /* ************************************************************************ */
-
     @Override
     public ForwardIterator<Data> FIterator() {
         return chn.FIterator();
@@ -115,10 +90,6 @@ public abstract class WSetBase<Data, Chn extends Chain<Data>> implements Set<Dat
     public BackwardIterator<Data> BIterator() {
         return chn.BIterator();
     }
-
-    /* ************************************************************************ */
-    /* Override specific member functions from TraversableContainer             */
-    /* ************************************************************************ */
 
     @Override
     public boolean TraverseForward(Predicate<Data> predicate) {
@@ -130,10 +101,6 @@ public abstract class WSetBase<Data, Chn extends Chain<Data>> implements Set<Dat
         return chn.TraverseBackward(predicate);
     }
 
-    /* ************************************************************************ */
-    /* Override specific member functions from Collection                       */
-    /* ************************************************************************ */
-
     @Override
     public Natural Size() {
         return chn.Size();
@@ -144,62 +111,47 @@ public abstract class WSetBase<Data, Chn extends Chain<Data>> implements Set<Dat
         return chn.Exists(dat);
     }
 
-    /* ************************************************************************ */
-    /* Override specific member functions from Set                              */
-    /* ************************************************************************ */
-
     @Override
     public void Union(Set<Data> set) {
-        // Unione: Aggiungi tutti gli elementi dell'altro set a questo.
-        // La logica di Insert(Data) gestirà i duplicati.
         this.InsertAll(set);
     }
 
     @Override
     public void Difference(Set<Data> set) {
-        // Differenza: Rimuovi da questo set tutti gli elementi presenti nell'altro set.
         this.RemoveAll(set);
     }
 
     @Override
     public void Intersection(Set<Data> set) {
-        // Intersezione: Mantieni solo gli elementi che sono presenti ANCHE nell'altro set.
-        // Approccio: Costruiamo una lista temporanea di elementi da rimuovere.
-        
         Chn toRemove = ChainAlloc();
         
-        // Attraversiamo questo set
         this.TraverseForward(data -> {
-            // Se l'elemento NON esiste nell'altro set, va rimosso
             if (!set.Exists(data)) {
                 toRemove.Insert(data);
             }
-            return true; // continua
+            return true;
         });
         
-        // Rimuoviamo gli elementi identificati
         this.RemoveAll(toRemove);
     }
 
     @Override
     public boolean IsEqual(IterableContainer<Data> set) {
         ForwardIterator<Data> it = set.FIterator();
-        while (it.IsValid()) { // Usa IsValid per verificare se ci sono elementi
-            Data dataToCheck = it.DataNNext(); // Ottiene il dato e avanza
+        while (it.IsValid()) {
+            Data dataToCheck = it.DataNNext();
             
             if (!this.Exists(dataToCheck)) {
-                return false; // Trovato un elemento esterno che non possiedo -> Diversi
+                return false;
             }
         }
         
         boolean foundMissing = this.TraverseForward(data -> {
             boolean existsInOther = false;
 
-            // Verifichiamo se 'data' esiste in 'set'
             if (set instanceof Set) {
                 existsInOther = ((Set<Data>) set).Exists(data);
             } else {
-                // Fallback manuale se 'set' è solo Iterable
                 ForwardIterator<Data> otherIt = set.FIterator();
                 while (otherIt.IsValid()) {
                     if (otherIt.DataNNext().equals(data)) {
@@ -209,12 +161,9 @@ public abstract class WSetBase<Data, Chn extends Chain<Data>> implements Set<Dat
                 }
             }
 
-            // Se NON esiste nell'altro, ritorniamo true.
-            // (TraverseForward si ferma e ritorna true appena trova questo caso)
             return !existsInOther; 
         });
 
-        // Se abbiamo trovato un elemento mancante, i set non sono uguali
         if (foundMissing) return false;
 
         return true;

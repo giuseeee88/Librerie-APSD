@@ -47,7 +47,6 @@ public class WOrderedSet<Data extends Comparable<? super Data>> extends WOrdered
 
     @Override
     public boolean Insert(Data dat) {
-        // VSortedChain mantiene l'ordine, noi garantiamo l'unicità
         if (!chn.Exists(dat)) {
             chn.Insert(dat);
             return true;
@@ -59,7 +58,7 @@ public class WOrderedSet<Data extends Comparable<? super Data>> extends WOrdered
     public void Union(Set<Data> set) {
         if (set == null) return;
         ForwardIterator<Data> it = set.FIterator();
-        while (it.IsValid()) { // CORRETTO
+        while (it.IsValid()) {
             this.Insert(it.GetCurrent());
             it.Next();
         }
@@ -69,7 +68,7 @@ public class WOrderedSet<Data extends Comparable<? super Data>> extends WOrdered
     public void Difference(Set<Data> set) {
         if (set == null) return;
         ForwardIterator<Data> it = set.FIterator();
-        while (it.IsValid()) { // CORRETTO
+        while (it.IsValid()) {
             this.Remove(it.GetCurrent());
             it.Next();
         }
@@ -78,8 +77,7 @@ public class WOrderedSet<Data extends Comparable<? super Data>> extends WOrdered
     @Override
     public void Intersection(Set<Data> set) {
         if (set == null) return;
-
-        // Usiamo VSortedChain per la lista temporanea (mantiene ordine, efficiente)
+        
         VSortedChain<Data> toRemove = new VSortedChain<>();
         ForwardIterator<Data> it = this.FIterator();
 
@@ -96,10 +94,6 @@ public class WOrderedSet<Data extends Comparable<? super Data>> extends WOrdered
     public boolean IsEqual(IterableContainer<Data> container) {
         if (container == null) return false;
         if (this.Size().compareTo(container.Size()) != 0) return false;
-
-        // Poiché WOrderedSet è ordinato, se anche 'container' fosse ordinato,
-        // potremmo fare un confronto lineare O(N).
-        // Tuttavia, IterableContainer è generico, quindi usiamo il controllo standard.
 
         ForwardIterator<Data> it = this.FIterator();
         while (it.IsValid()) {
