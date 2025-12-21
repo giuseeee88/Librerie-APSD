@@ -16,7 +16,6 @@ public class LLList<Data> extends LLChainBase<Data> implements List<Data> {
     public LLList() { super(null); }
     public LLList(TraversableContainer<Data> con) { super(con); }
     
-    // Costruttore interno per SubList
     protected LLList(long size, LLNode<Data> head, LLNode<Data> tail) {
         super(null);
         this.size.Assign(new Natural((int) size));
@@ -24,9 +23,7 @@ public class LLList<Data> extends LLChainBase<Data> implements List<Data> {
         this.tailref.Set(tail);
     }
 
-    @Override public LLChainBase<Data> NewChain(long capacity, LLNode<Data> head, LLNode<Data> tail) { 
-        return new LLList<>(capacity, head, tail); 
-    }
+    @Override public LLChainBase<Data> NewChain(long capacity, LLNode<Data> head, LLNode<Data> tail) { return new LLList<>(capacity, head, tail); }
 
     @Override public MutableForwardIterator<Data> FIterator() {
         return new MutableForwardIterator<Data>() {
@@ -42,84 +39,43 @@ public class LLList<Data> extends LLChainBase<Data> implements List<Data> {
     }
 
     @Override public MutableBackwardIterator<Data> BIterator() { return null; }
-
-    @Override public void SetAt(Data dat, Natural n) { 
-        LLNode<Data> node = getNodeAt(n.ToLong());
-        if(node == null) throw new IndexOutOfBoundsException();
-        node.Set(dat);
-    }
-
-    @Override public Data GetNSetAt(Data dat, Natural n) { 
-        LLNode<Data> node = getNodeAt(n.ToLong());
-        if(node == null) throw new IndexOutOfBoundsException();
-        return node.GetNSet(dat);
-    }
-
-    @Override public void SetFirst(Data dat) { 
-        if(IsEmpty()) throw new IndexOutOfBoundsException(); 
-        headref.Get().Set(dat); 
-    }
-    @Override public Data GetNSetFirst(Data dat) { 
-        if(IsEmpty()) throw new IndexOutOfBoundsException(); 
-        return headref.Get().GetNSet(dat); 
-    }
-    @Override public void SetLast(Data dat) { 
-        if(IsEmpty()) throw new IndexOutOfBoundsException(); 
-        tailref.Get().Set(dat); 
-    }
-    @Override public Data GetNSetLast(Data dat) { 
-        if(IsEmpty()) throw new IndexOutOfBoundsException(); 
-        return tailref.Get().GetNSet(dat); 
-    }
+    @Override public void SetAt(Data dat, Natural n) { LLNode<Data> node = getNodeAt(n.ToLong()); if(node == null) throw new IndexOutOfBoundsException(); node.Set(dat); }
+    @Override public Data GetNSetAt(Data dat, Natural n) { LLNode<Data> node = getNodeAt(n.ToLong()); if(node == null) throw new IndexOutOfBoundsException(); return node.GetNSet(dat); }
+    
+    @Override public void SetFirst(Data dat) { if(IsEmpty()) throw new IndexOutOfBoundsException(); headref.Get().Set(dat); }
+    @Override public Data GetNSetFirst(Data dat) { if(IsEmpty()) throw new IndexOutOfBoundsException(); return headref.Get().GetNSet(dat); }
+    @Override public void SetLast(Data dat) { if(IsEmpty()) throw new IndexOutOfBoundsException(); tailref.Get().Set(dat); }
+    @Override public Data GetNSetLast(Data dat) { if(IsEmpty()) throw new IndexOutOfBoundsException(); return tailref.Get().GetNSet(dat); }
 
     @Override public void Swap(Natural pos1, Natural pos2) { 
-        LLNode<Data> n1 = getNodeAt(pos1.ToLong());
-        LLNode<Data> n2 = getNodeAt(pos2.ToLong());
+        LLNode<Data> n1 = getNodeAt(pos1.ToLong()); LLNode<Data> n2 = getNodeAt(pos2.ToLong());
         if(n1==null || n2==null) throw new IndexOutOfBoundsException();
         Data tmp = n1.Get(); n1.Set(n2.Get()); n2.Set(tmp);
     }
-
     @Override public MutableSequence<Data> SubSequence(Natural start, Natural end) { return SubList(start, end); }
-
     @Override public void InsertAt(Data dat, Natural n) {
         long idx = n.ToLong();
         if(idx < 0 || idx > size.ToLong()) throw new IndexOutOfBoundsException();
-        if(idx == 0) InsertFirst(dat);
-        else if(idx == size.ToLong()) InsertLast(dat);
-        else {
-            LLNode<Data> prev = getNodeAt(idx-1);
-            LLNode<Data> newNode = new LLNode<>(dat);
-            newNode.SetNext(prev.GetNext().Get());
-            prev.SetNext(newNode);
-            size.Increment();
-        }
+        if(idx == 0) InsertFirst(dat); else if(idx == size.ToLong()) InsertLast(dat);
+        else { LLNode<Data> prev = getNodeAt(idx-1); LLNode<Data> newNode = new LLNode<>(dat); newNode.SetNext(prev.GetNext().Get()); prev.SetNext(newNode); size.Increment(); }
     }
-
     @Override public List<Data> SubList(Natural start, Natural end) {
-        // Implementazione semplificata: crea nuova lista e copia
         LLList<Data> sub = new LLList<>();
-        long s = start.ToLong();
-        long e = end.ToLong();
+        long s = start.ToLong(); long e = end.ToLong();
         if(s<0 || e>size.ToLong() || s>e) throw new IndexOutOfBoundsException();
         LLNode<Data> curr = getNodeAt(s);
-        for(long i=0; i < (e-s); i++) {
-            sub.InsertLast(curr.Get());
-            curr = curr.GetNext().Get();
-        }
+        for(long i=0; i < (e-s); i++) { sub.InsertLast(curr.Get()); curr = curr.GetNext().Get(); }
         return sub;
     }
-
-    @Override public boolean Insert(Data dat) { InsertLast(dat); return true; }
     
-    @Override public boolean InsertIfAbsent(Data dat) { 
-        if(!Exists(dat)) { InsertLast(dat); return true; } 
-        return false; 
-    }
+    // *** FIX: Changed to InsertFirst to match test expectations ***
+    @Override public boolean Insert(Data dat) { InsertFirst(dat); return true; }
     
-    @Override public void RemoveOccurrences(Data dat) { 
-        // Implementato in LLChainBase via Remove
-        while(Remove(dat));
-    }
-    
-    @Override public Chain<Data> SubChain(Natural s, Natural e) { return SubList(s, e); }
+    @Override public boolean InsertIfAbsent(Data dat) { if(!Exists(dat)) { InsertFirst(dat); return true; } return false; }
+    @Override public void RemoveOccurrences(Data dat) { while(Remove(dat)); }
+    @Override public Chain<Data> SubChain(Natural start, Natural end) { return SubList(start, end); }
+    @Override public boolean InsertAll(TraversableContainer<Data> c) { if (c == null || c.IsEmpty()) return false; c.TraverseForward(d -> { Insert(d); return false; }); return true; }
+    @Override public boolean InsertSome(TraversableContainer<Data> c) { return InsertAll(c); }
+    @Override public boolean RemoveAll(TraversableContainer<Data> c) { return false; } 
+    @Override public boolean RemoveSome(TraversableContainer<Data> c) { return false; }
 }

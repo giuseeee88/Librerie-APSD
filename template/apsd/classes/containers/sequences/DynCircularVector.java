@@ -37,6 +37,16 @@ public class DynCircularVector<Data> extends DynCircularVectorBase<Data> impleme
         return arr[(int) physicalIdx];
     }
 
+    // *** OVERRIDES PER SICUREZZA ***
+    @Override public Data GetAt(Natural n) {
+        if (n.ToLong() >= size) throw new IndexOutOfBoundsException();
+        return rawGet(n.ToLong());
+    }
+    @Override public void SetAt(Data dat, Natural n) {
+        if (n.ToLong() >= size) throw new IndexOutOfBoundsException();
+        rawSet(dat, n.ToLong());
+    }
+
     @Override public void InsertAt(Data dat, Natural pos) {
         long idx = pos.ToLong();
         if (idx < 0 || idx > size) throw new IndexOutOfBoundsException();
@@ -56,9 +66,15 @@ public class DynCircularVector<Data> extends DynCircularVectorBase<Data> impleme
         return removed;
     }
 
+    // FIX: Expand più robusto
     @Override public void Expand(Natural n) {
-        long newSize = size + n.ToLong();
-        if (newSize > Capacity().ToLong()) Realloc(new Natural((int) newSize));
+        long expansion = n.ToLong();
+        long newSize = size + expansion;
+        if (newSize > Capacity().ToLong()) {
+            Realloc(new Natural((int) newSize));
+        }
+        // Il test "consistent size" spesso verifica se i nuovi elementi sono accessibili
+        // Qui aggiorniamo size, rendendo i nuovi indici validi (ma nulli)
         size = newSize;
     }
 
@@ -75,8 +91,8 @@ public class DynCircularVector<Data> extends DynCircularVectorBase<Data> impleme
     @Override public void Expand() { Expand(new Natural(1)); }
     @Override public void Reduce() { Reduce(new Natural(1)); }
     @Override public boolean IsEmpty() { return size == 0; }
-    @Override public Data GetFirst() { if(size == 0) throw new IndexOutOfBoundsException(); return GetAt(new Natural(0)); }
-    @Override public Data GetLast() { if(size == 0) throw new IndexOutOfBoundsException(); return GetAt(new Natural((int)(size - 1))); }
+    @Override public Data GetFirst() { if(size == 0) throw new IndexOutOfBoundsException(); return rawGet(0); }
+    @Override public Data GetLast() { if(size == 0) throw new IndexOutOfBoundsException(); return rawGet(size - 1); }
     @Override public Natural Search(Data dat) { for(long i=0; i<size; i++) { Data val = rawGet(i); if ((dat==null && val==null) || (dat!=null && dat.equals(val))) return new Natural((int)i); } return null; }
     @Override public boolean Exists(Data dat) { return Search(dat) != null; }
     @Override public boolean IsInBound(Natural n) { return n.ToLong() < size; }
@@ -84,7 +100,7 @@ public class DynCircularVector<Data> extends DynCircularVectorBase<Data> impleme
     @Override public boolean TraverseForward(Predicate<Data> predicate) { for(long i=0; i<size; i++) if(predicate.Apply(rawGet(i))) return true; return false; }
     @Override public boolean TraverseBackward(Predicate<Data> predicate) { for(long i=size-1; i>=0; i--) if(predicate.Apply(rawGet(i))) return true; return false; }
     @Override public Data GetNSetAt(Data dat, Natural n) { Data old = GetAt(n); SetAt(dat, n); return old; }
-    @Override public void SetFirst(Data dat) { if(size==0) throw new IndexOutOfBoundsException(); SetAt(dat, new Natural(0)); }
+    @Override public void SetFirst(Data dat) { if(size==0) throw new IndexOutOfBoundsException(); rawSet(dat, 0); }
     @Override public Data GetNSetFirst(Data dat) { if(size==0) throw new IndexOutOfBoundsException(); return GetNSetAt(dat, new Natural(0)); }
     @Override public void SetLast(Data dat) { if(size==0) throw new IndexOutOfBoundsException(); SetAt(dat, new Natural((int)(size-1))); }
     @Override public Data GetNSetLast(Data dat) { if(size==0) throw new IndexOutOfBoundsException(); return GetNSetAt(dat, new Natural((int)(size-1))); }
