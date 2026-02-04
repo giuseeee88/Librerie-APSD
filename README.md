@@ -1,6 +1,6 @@
 # 📚 Librerie per Analisi e Progettazione di Strutture Dati
 
-Progettazione e implementazione di una libreria di **strutture dati fondamentali** in Java, sviluppata seguendo i principi della programmazione a oggetti (OOP) e i diversi livelli di astrazione.
+Progettazione e implementazione di librerie di **strutture dati fondamentali** in Java, sviluppata in linguaggio Java seguendo i principi della programmazione a oggetti (OOP) e i diversi livelli di astrazione.
 
 ---
 
