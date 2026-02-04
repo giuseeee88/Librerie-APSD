@@ -18,17 +18,25 @@ Il progetto si focalizza sulla creazione di strutture robuste e riutilizzabili, 
 * **Stack (Pila):** Gestione LIFO (*Last-In-First-Out*).
 * **Queue (Coda):** Gestione FIFO (*First-In-First-Out*).
 
-> [!IMPORTANT]
-> **Generics:** Le strutture dati sono progettate per essere utilizzate con dati generici in modo da renderle totalmente indipendenti dal tipo di dato contenuto
+> [!IMPORTANTE]
+> Le strutture dati sono progettate per essere utilizzate con dati generici ovvero interi, stringhe ecc.
 
 ---
 
 ## 🚀 Guida all'uso e Testing
 
-Per verificare il corretto funzionamento delle librerie, sono disponibili dei test predefiniti nella cartella `zapsdtest`.
+Per verificare il corretto funzionamento delle librerie, sono disponibili dei test predefiniti nella cartella `zapsdtest` mediante l'utilizzo del framework JUnit5
 
 ### Eseguire i Test
 Apri una sessione **PowerShell** nella directory principale del progetto (`apsd`) ed esegui il seguente comando:
 
 ```powershell
 powershell.exe -ExecutionPolicy Bypass -File .\winbuild.ps1 runtest
+```
+
+### Eliminare i file .class creati dal compilatore Java dopo la compilazione del codice
+Apri una sessione **PowerShell** nella directory principale del progetto (`apsd`) ed esegui il seguente comando:
+
+```powershell
+Get-ChildItem -Recurse -Filter *.class | Remove-Item -Force
+```
