@@ -1,4 +1,4 @@
-# 📚 Java Data Structures Library
+# 📚 Librerie per Analisi e Progettazione di Strutture Dati
 
 Progettazione e implementazione di una libreria di **strutture dati fondamentali** in Java, sviluppata seguendo i principi della programmazione a oggetti (OOP) e i diversi livelli di astrazione.
 
@@ -8,7 +8,7 @@ Progettazione e implementazione di una libreria di **strutture dati fondamentali
 
 Il progetto si focalizza sulla creazione di strutture robuste e riutilizzabili, organizzate attraverso:
 
-* **Interfacce:** Per definire il comportamento (contratto) delle strutture.
+* **Interfacce:** Per definire il comportamento delle strutture.
 * **Classi Astratte:** Per fattorizzare il codice comune e ridurre la ridondanza.
 * **Classi Concrete:** Implementazioni specifiche pronte all'uso.
 
@@ -19,9 +19,7 @@ Il progetto si focalizza sulla creazione di strutture robuste e riutilizzabili, 
 * **Queue (Coda):** Gestione FIFO (*First-In-First-Out*).
 
 > [!IMPORTANT]
-> **Generics:** Tutte le strutture utilizzano i **Java Generics** (`<T>`), rendendo la libreria totalmente indipendente dal tipo di dato contenuto e garantendo il *type-safety* a tempo di compilazione.
-
-
+> **Generics:** Le strutture dati sono progettate per essere utilizzate con dati generici in modo da renderle totalmente indipendenti dal tipo di dato contenuto
 
 ---
 
