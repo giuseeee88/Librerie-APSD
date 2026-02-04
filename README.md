@@ -18,7 +18,7 @@ Il progetto si focalizza sulla creazione di strutture robuste e riutilizzabili, 
 * **Stack (Pila):** Gestione LIFO (*Last-In-First-Out*).
 * **Queue (Coda):** Gestione FIFO (*First-In-First-Out*).
 
-> [!IMPORTANTE]
+> [!IMPORTANT]
 > Le strutture dati sono progettate per essere utilizzate con dati generici ovvero interi, stringhe ecc.
 
 ---
