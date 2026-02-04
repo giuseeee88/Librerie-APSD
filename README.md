@@ -18,6 +18,15 @@ Il progetto si focalizza sulla creazione di strutture robuste e riutilizzabili, 
 * **Stack (Pila):** Gestione LIFO (*Last-In-First-Out*).
 * **Queue (Coda):** Gestione FIFO (*First-In-First-Out*).
 
+### Informazioni sul diagramma delle classi/interfacce
+La struttura del progetto è organizzata secondo il diagramma delle classi/interfacce presente nel file `Diagrams.pdf`
+Nelle varie classi e nelle varie interfacce sono riportati dei metodi con determinati colori, i quali vanno interpretati nel seguente modo:
+* Nero - Metodo astratto
+* Verde - Metodo con implementazione default
+* Blu - Metodo reiimplementato (override)
+* Rosso - Metodo reiimplementato astratto
+Mentre nelle tabelle i metodi di una determinata classe che hanno le spunte devono essere reiimplementati
+
 > [!IMPORTANT]
 > Le strutture dati sono progettate per essere utilizzate con dati generici ovvero interi, stringhe ecc.
 
