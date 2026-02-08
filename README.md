@@ -25,6 +25,7 @@ Nelle varie classi e nelle varie interfacce sono riportati dei metodi con determ
 * Verde - Metodo con implementazione default
 * Blu - Metodo reiimplementato (override)
 * Rosso - Metodo reiimplementato astratto
+
 Mentre nelle tabelle i metodi di una determinata classe che hanno le spunte devono essere reiimplementati
 
 > [!IMPORTANT]
